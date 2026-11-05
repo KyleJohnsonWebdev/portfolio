@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Case study — contextlayer.design</title>
+
+</head>
+<body>
+<div>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAFAF7}
+.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:12px;z-index:10;background:#16161A;color:#FAFAF7;padding:10px 16px;border-radius:6px}
+a{color:#2B4BE0}a:hover{color:#16161A}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.prose{max-width:68ch}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
+.ph{font-family:'Geist Mono',ui-monospace,monospace;font-size:13px;color:#55555E;border:1.5px dashed #8A8A93;border-radius:4px;padding:2px 8px;background:#F1F0EB;display:inline-block}
+.lbl{font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;color:#55555E;letter-spacing:0.02em}
+.badge{font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;border:1px solid #8A8A93;border-radius:4px;padding:2px 8px;color:#16161A}
+.shot{aspect-ratio:16/9;border-radius:6px;background:#F1F0EB;border:1.5px dashed #8A8A93;display:flex;align-items:center;justify-content:center}
+.dec{border:1px solid #D9D8D2;border-radius:8px;padding:24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 32px}
+h2{margin:0;font-size:27px;font-weight:600}
+@media (max-width:760px){.tldr,.proof,.dec{grid-template-columns:minmax(0,1fr)!important}.h1{font-size:36px!important}}
+</style>
+
+<div style="font-family:'Geist',ui-sans-serif,system-ui,sans-serif;color:#16161A;background:#FAFAF7;font-size:17px;line-height:1.6">
+  <a class="skip" href="#main">Skip to main content</a>
+  <header style="border-bottom:1px solid #D9D8D2">
+    <div class="wrap" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;padding-bottom:20px">
+      <a href="home.html" style="font-weight:600;color:#16161A;text-decoration:none">Kyle Johnson</a>
+      <nav aria-label="Primary" style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;font-size:15px">
+        <a href="home.html#work" aria-current="page" style="color:#16161A">Work</a>
+        <a href="about-contact.html" style="color:#55555E">About</a>
+        <a href="resume.html" style="color:#55555E">Resume</a>
+        <a href="about-contact.html#contact" style="color:#55555E">Contact</a>
+        <button type="button" aria-label="Switch color theme" style="font:inherit;font-size:13px;min-height:44px;min-width:44px;border:1px solid #8A8A93;border-radius:4px;background:transparent;color:#16161A;padding:0 12px">Theme</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" style="display:flex;flex-direction:column;gap:72px;padding-bottom:96px">
+    <section class="wrap" style="padding-top:64px;display:flex;flex-direction:column;gap:20px">
+      <a href="home.html#work" style="font-size:15px">← All work</a>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="badge">In progress</span><span class="badge">Case study 1 of 3</span></div>
+      <h1 class="h1" style="margin:0;font-size:52px;line-height:1.08;font-weight:600;letter-spacing:-0.02em">contextlayer.design</h1>
+      <p class="prose" style="margin:0;font-size:21px;line-height:1.5;color:#55555E">Rebuilding Design Is Oxygen, a learning platform recognized through Full Sail's Vibrancy Campus Initiative, as a site where design, code and AI meet.</p>
+
+      <dl class="tldr" style="margin:16px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;border-top:1px solid #D9D8D2;padding-top:24px">
+        <div><dt class="lbl">ROLE</dt><dd style="margin:4px 0 0">Designer and developer</dd></div>
+        <div><dt class="lbl">STACK</dt><dd style="margin:4px 0 0"><span class="ph">[CONFIRM STACK]</span></dd></div>
+        <div><dt class="lbl">TIMELINE</dt><dd style="margin:4px 0 0"><span class="ph">[START] – present</span></dd></div>
+        <div><dt class="lbl">OUTCOME</dt><dd style="margin:4px 0 0"><span class="ph">[ONE NUMBER + SOURCE]</span></dd></div>
+      </dl>
+      <p style="margin:0;font-size:15px"><a href="https://contextlayer.design">Visit the live site</a> · <a href="#">View the repo <span class="ph">[REPO URL]</span></a></p>
+    </section>
+
+    <section aria-labelledby="proof-h" style="background:#F1F0EB">
+      <div class="wrap" style="padding-top:32px;padding-bottom:32px;display:flex;flex-direction:column;gap:16px">
+        <h2 id="proof-h" class="lbl" style="font-size:12px;font-weight:500">PROOF · LIGHTHOUSE MOBILE · TESTED <span class="ph">[DATE]</span></h2>
+        <dl class="proof" style="margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px">
+          <div><dt class="lbl">PERFORMANCE</dt><dd class="mono" style="margin:4px 0 0;font-size:33px;font-weight:500"><span class="ph" style="font-size:20px">[00]</span></dd></div>
+          <div><dt class="lbl">ACCESSIBILITY</dt><dd class="mono" style="margin:4px 0 0;font-size:33px;font-weight:500"><span class="ph" style="font-size:20px">[00]</span></dd></div>
+          <div><dt class="lbl">BEST PRACTICES</dt><dd class="mono" style="margin:4px 0 0;font-size:33px;font-weight:500"><span class="ph" style="font-size:20px">[00]</span></dd></div>
+          <div><dt class="lbl">SEO</dt><dd class="mono" style="margin:4px 0 0;font-size:33px;font-weight:500"><span class="ph" style="font-size:20px">[00]</span></dd></div>
+          <div><dt class="lbl">REPORT</dt><dd style="margin:8px 0 0"><a href="#">Full report (JSON)</a></dd></div>
+        </dl>
+        <p style="margin:0;font-size:13px;color:#55555E">Scores of 90+ display in green with the word "Pass"; color is never the only signal.</p>
+      </div>
+    </section>
+
+    <section class="wrap"><div class="shot"><span class="ph">[HERO SCREENSHOT IN BROWSER FRAME — alt text required]</span></div></section>
+
+    <section aria-labelledby="problem-h" class="wrap" style="display:flex;flex-direction:column;gap:16px">
+      <h2 id="problem-h">Problem</h2>
+      <p class="prose" style="margin:0">Design Is Oxygen was retired in October 2026. <span class="ph">[1–2 SENTENCES: what that cost students, and how you know]</span></p>
+    </section>
+
+    <section aria-labelledby="con-h" class="wrap" style="display:flex;flex-direction:column;gap:16px">
+      <h2 id="con-h">Constraints</h2>
+      <ul class="prose" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
+        <li>Built on approved work time, needing a director pitch before Full Sail adopts it.</li>
+        <li><span class="ph">[CONSTRAINT: time, budget, audience or tech]</span></li>
+        <li><span class="ph">[ONE MORE: time, budget, audience or tech]</span></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="dec-h" class="wrap" style="display:flex;flex-direction:column;gap:20px">
+      <h2 id="dec-h">Key decisions</h2>
+      <article class="dec">
+        <h3 style="margin:0;font-size:21px;grid-column:1/-1">Break every concept down three ways</h3>
+        <div><p class="lbl" style="margin:0">CHOSE</p><p style="margin:4px 0 0">Design, code and AI prompt side by side for each concept</p></div>
+        <div><p class="lbl" style="margin:0">INSTEAD OF</p><p style="margin:4px 0 0"><span class="ph">[THE OBVIOUS OPTION]</span></p></div>
+        <div><p class="lbl" style="margin:0">BECAUSE</p><p style="margin:4px 0 0"><span class="ph">[REASON TIED TO STUDENTS]</span></p></div>
+        <div><p class="lbl" style="margin:0">COST</p><p style="margin:4px 0 0"><span class="ph">[WHAT YOU GAVE UP]</span></p></div>
+      </article>
+      <article class="dec">
+        <h3 style="margin:0;font-size:21px;grid-column:1/-1"><span class="ph">[DECISION 2 — e.g. content pipeline or stack]</span></h3>
+        <div><p class="lbl" style="margin:0">CHOSE</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+        <div><p class="lbl" style="margin:0">INSTEAD OF</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+        <div><p class="lbl" style="margin:0">BECAUSE</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+        <div><p class="lbl" style="margin:0">COST</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+      </article>
+      <article class="dec">
+        <h3 style="margin:0;font-size:21px;grid-column:1/-1">Use AI-assisted workflows, and show where</h3>
+        <div><p class="lbl" style="margin:0">CHOSE</p><p style="margin:4px 0 0"><span class="ph">[WHICH TOOLS, FOR WHICH STEPS]</span></p></div>
+        <div><p class="lbl" style="margin:0">INSTEAD OF</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+        <div><p class="lbl" style="margin:0">BECAUSE</p><p style="margin:4px 0 0"><span class="ph">[ ]</span></p></div>
+        <div><p class="lbl" style="margin:0">COST</p><p style="margin:4px 0 0"><span class="ph">[WHAT YOU STILL DID BY HAND]</span></p></div>
+      </article>
+    </section>
+
+    <section aria-labelledby="out-h" class="wrap" style="display:flex;flex-direction:column;gap:16px">
+      <h2 id="out-h">Outcome</h2>
+      <p class="prose" style="margin:0">Design Is Oxygen, the original platform, was recognized through Full Sail's Vibrancy Campus Initiative. <span class="ph">[LINK OR IMAGE OF RECOGNITION]</span></p>
+      <ul class="prose" style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
+        <li><span class="ph">[METRIC] · source: [ ] · date: [ ]</span></li>
+        <li><span class="ph">[METRIC] · source: [ ] · date: [ ]</span></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="next-h" class="wrap" style="display:flex;flex-direction:column;gap:16px">
+      <h2 id="next-h">What's next</h2>
+      <p class="prose" style="margin:0">Pitch the rebuild to the Full Sail director for adoption. <span class="ph">[DATE OR MILESTONE]</span></p>
+    </section>
+
+    <nav aria-label="More case studies" class="wrap" style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;border-top:1px solid #D9D8D2;padding-top:24px">
+      <a href="home.html#work">← All work</a>
+      <a href="case-study-template.html">Next: maybespecial.com →</a>
+    </nav>
+  </main>
+</div>
+</div>
+
+</body>
+</html>
