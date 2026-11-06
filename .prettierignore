@@ -17,3 +17,5 @@ out/
 # Other generated files
 *.min.js
 *.min.css
+# Generated from docs/design-system/tokens.json
+frontend/app/tokens.css
