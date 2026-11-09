@@ -9,6 +9,7 @@ import PortableText from '@/app/components/PortableText'
 import ProofStrip from '@/app/components/ProofStrip'
 import StatusBadge from '@/app/components/StatusBadge'
 import TLDR from '@/app/components/TLDR'
+import {caseStudyStatusLabel} from '@/lib/case-study'
 import {displayHost, formatMonthYear} from '@/lib/format'
 import type {CaseStudyQueryResult} from '@/sanity.types'
 
@@ -39,9 +40,7 @@ export default function CaseStudyView({
   study: StegaBranded<NonNullable<CaseStudyQueryResult>>
   preview: boolean
 }) {
-  const status = stegaClean(study.status)
-  const launch = formatMonthYear(stegaClean(study.launchDate))
-  const statusLabel = status === 'live' ? 'Live' : launch ? `Launching ${launch}` : 'In progress'
+  const statusLabel = caseStudyStatusLabel(study.status, study.launchDate)
   const liveUrl = stegaClean(study.liveUrl)
   const repoUrl = stegaClean(study.repoUrl)
   const missing = (label: string) => (preview ? <Placeholder label={label} /> : null)
