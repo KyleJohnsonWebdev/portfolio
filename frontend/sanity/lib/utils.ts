@@ -7,19 +7,18 @@ const builder = createImageUrlBuilder({
   dataset: dataset || '',
 })
 
-// Create an image URL builder using the client
-// Export a function that can be used to get image URLs
-function urlForImage(source: SanityImageSource) {
+/** Sanity CDN URL builder. Applies the editor's crop when the source includes one. */
+export function urlForImage(source: SanityImageSource) {
   return builder.image(source)
 }
 
 export function resolveOpenGraphImage(
   image?: SanityImageSource | null,
   width = 1200,
-  height = 627,
+  height = 630,
 ) {
   if (!image) return
-  const url = urlForImage(image)?.width(1200).height(627).fit('crop').url()
+  const url = urlForImage(image)?.width(width).height(height).fit('crop').url()
   if (!url) return
   return {url, alt: (image as {alt?: string})?.alt || '', width, height}
 }
