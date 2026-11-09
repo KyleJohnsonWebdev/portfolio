@@ -1,108 +1,115 @@
-# Clean Next.js + Sanity app
+# Kyle Johnson — Portfolio
 
-This template includes a [Next.js](https://nextjs.org/) app with a [Sanity Studio](https://www.sanity.io/) – an open-source React application that connects to your Sanity project’s hosted dataset. The Studio is configured locally and can then be deployed for content collaboration.
+A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-![Screenshot of Sanity Studio using Presentation Tool to do Visual Editing](/sanity-next-preview.png)
+Status: all v1 pages are built, with SEO metadata and CI quality gates. Next: publish two finished case studies and ship v1.
 
-## Features
+## Stack
 
-- **Next.js 16 for Performance:** Leverage the power of Next.js 16 App Router for blazing-fast performance and SEO-friendly static sites.
-- **Real-time Visual Editing:** Edit content live with Sanity's [Presentation Tool](https://www.sanity.io/docs/presentation) and see updates in real time.
-- **Live Content:** The [Live Content API](https://www.sanity.io/live) allows you to deliver live, dynamic experiences to your users without the complexity and scalability challenges that typically come with building real-time functionality.
-- **Customizable Pages with Drag-and-Drop:** Create and manage pages using a page builder with dynamic components and [Drag-and-Drop Visual Editing](https://www.sanity.io/visual-editing-for-structured-content).
-- **Powerful Content Management:** Collaborate with team members in real-time, with fine-grained revision history.
-- **AI-powered Media Support:** Auto-generate alt text with [Sanity AI Assist](https://www.sanity.io/ai-assist).
-- **On-demand Publishing:** No waiting for rebuilds—new content is live instantly with Incremental Static Revalidation.
-- **Easy Media Management:** [Integrated Unsplash support](https://www.sanity.io/plugins/sanity-plugin-asset-source-unsplash) for seamless media handling.
+- Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict)
+- Tailwind CSS v4
+- Sanity v6 Studio with `next-sanity`, Visual Editing and Live Content
+- Sanity TypeGen for typed GROQ queries
+- Vercel (site, Analytics, Speed Insights)
+- npm workspaces + Turborepo: `frontend/` (the site) and `studio/` (Sanity Studio)
 
-## Demo
+## Run locally
 
-https://template-nextjs-clean.sanity.dev
-
-## Getting Started
-
-### Installing the template
-
-> **Already deployed with Vercel?** If you've already deployed using the **Sanity + Vercel Integration** or **one-click Vercel button**, please visit our [Vercel deployment instructions](vercel-installation-instructions.md) to set up your local environment and deploy Sanity Studio.
-
-#### 1. Initialize template with Sanity CLI
-
-Run the command in your Terminal to initialize this template on your local computer.
+Requires Node 22 (`nvm use` reads `.nvmrc`).
 
 ```shell
-npm create sanity@latest -- --template sanity-io/sanity-template-nextjs-clean
-```
-
-See the documentation if you are [having issues with the CLI](https://www.sanity.io/help/cli-errors).
-
-#### 2. Run Studio and Next.js app locally
-
-Navigate to the template directory using `cd <your app name>`, and start the development servers by running the following command
-
-```shell
+npm install
+cp frontend/.env.example frontend/.env.local   # then fill in the Sanity values
 npm run dev
 ```
 
-#### 3. Open the app and sign in to the Studio
+- Site: http://localhost:3000
+- Studio: http://localhost:3333
 
-Open the Next.js app running locally in your browser on [http://localhost:3000](http://localhost:3000).
+Other scripts, all from the repo root:
 
-Open the Studio running locally in your browser on [http://localhost:3333](http://localhost:3333). You should now see a screen prompting you to log in to the Studio. Use the same service (Google, GitHub, or email) that you used when you logged in to the CLI.
+| Command                          | What it does                                                       |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `npm run build`                  | Builds the site and the Studio through Turborepo                   |
+| `npm run type-check`             | Runs `tsc` in both workspaces                                      |
+| `npm run lint`                   | Lints the site and the Studio                                      |
+| `npm test`                       | Runs the Studio's validation rule tests                            |
+| `npm run format:check`           | Fails on unformatted files (what CI runs)                          |
+| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)             |
+| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (after `npm run build`) |
+| `npm run format`                 | Formats the repo with Prettier                                     |
 
-### Adding content with Sanity
+The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never commit `.env*` files.
 
-#### 1. Publish your first document
+### Design tokens
 
-The template comes pre-defined with a schema containing `Page`, `Post`, `Person`, and `Settings` document types.
-
-From the Studio, click "+ Create" and select the `Post` document type. Go ahead and create and publish the document.
-
-Your content should now appear in your Next.js app ([http://localhost:3000](http://localhost:3000)) as well as in the Studio on the "Presentation" Tab
-
-#### 2. Import Sample Data (optional)
-
-You may want to start with some sample content and we've got you covered. Run this command from the root of your project to import the provided dataset (sample-data.tar.gz) into your Sanity project. This step is optional but can be helpful for getting started quickly.
-
-```shell
-npm run import-sample-data
-```
-
-#### 3. Extending the Sanity schema
-
-The schema for the `Post` document type is defined in the `studio/src/schemaTypes/post.ts` file. You can [add more document types](https://www.sanity.io/docs/studio/schema-types) to the schema to suit your needs.
-
-### Deploying your application and inviting editors
-
-#### 1. Deploy Sanity Studio
-
-Your Next.js frontend (`/frontend`) and Sanity Studio (`/studio`) are still only running on your local computer. It's time to deploy and get it into the hands of other content editors.
-
-Back in your Studio directory (`/studio`), run the following command to deploy your Sanity Studio.
+`docs/design-system/tokens.json` is the source of truth. After editing it, regenerate the CSS and commit both files:
 
 ```shell
-npx sanity deploy
+npm run tokens --workspace=frontend   # writes frontend/app/tokens.css
 ```
 
-#### 2. Deploy Next.js app to Vercel
+`frontend/app/globals.css` maps the tokens into Tailwind and clears Tailwind's default palette, radii, shadows, widths and type scale, so only token utilities exist: `bg-bg`, `text-ink`, `border-line`, `text-display` … `text-label`, `rounded-sm|md|lg`, `max-w-page`, `max-w-reading` (the 68ch prose width), `min-h-target`. Spacing uses Tailwind's 4px scale, which the `space-N` tokens match by number (`p-6` = `space-6` = 24px); the generator fails if they ever drift apart.
 
-You have the freedom to deploy your Next.js app to your hosting provider of choice. With Vercel and GitHub being a popular choice, we'll cover the basics of that approach.
+## Content model
 
-1. Create a GitHub repository from this project. [Learn more](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github).
-2. Create a new Vercel project and connect it to your Github repository.
-3. Set the `Root Directory` to your Next.js app.
-4. Configure your Environment Variables.
+Edited in the Studio (`studio/`):
 
-#### 3. Invite a collaborator
+| Type           | Kind       | What it holds                                                           |
+| -------------- | ---------- | ----------------------------------------------------------------------- |
+| `siteSettings` | Singleton  | Name, job title, home headline, contact links, resume PDF, SEO defaults |
+| `about`        | Singleton  | About page story, portrait, "The path here" timeline, home teaser       |
+| `resume`       | Singleton  | Tagline, summary, experience, skills, education                         |
+| `caseStudy`    | Collection | TL;DR, Lighthouse proof, problem, constraints, decisions, outcome, next |
 
-Now that you’ve deployed your Next.js application and Sanity Studio, you can optionally invite a collaborator to your Studio. Open up [Manage](https://www.sanity.io/manage), select your project and click "Invite project members"
+The Studio enforces the site's honesty rules. A document can't be published while it breaks one:
 
-They will be able to access the deployed Studio, where you can collaborate together on creating content.
+- Every number (`metric`) has a value, a source and a date.
+- A case study that names a client needs confirmed, dated written permission.
+- Lighthouse scores need the date they were tested.
+- Every image has alt text.
+- Each case study has two or three decisions, and every decision names its cost.
+- Meta descriptions stay within 160 characters.
 
-## Resources
+The rules live in `studio/src/schemaTypes/validation.ts` as plain functions with unit tests.
 
-- [Sanity documentation](https://www.sanity.io/docs)
-- [Next.js documentation](https://nextjs.org/docs)
-- [Join the Sanity Community](https://slack.sanity.io)
-- [Learn Sanity](https://www.sanity.io/learn)
+### Drafts and placeholders
 
-[vercel-deploy]: https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsanity-io%2Fsanity-template-nextjs-clean&project-name=nextjs-clean-website-sanity-template&repository-name=nextjs-clean-website-sanity-template&demo-title=Clean%20Next.js%20%2B%20Sanity%20app&demo-description=A%20clean%20Next.js%20plus%20Sanity%20starter%20with%20real-time%20visual%20editing%2C%20drag-and-drop%20page%20builder%2C%20AI%20media%20support%2C%20and%20live%20content%20updates.&demo-url=https%3A%2F%2Ftemplate-nextjs-clean.sanity.build%2F&demo-image=https%3A%2F%2Fraw.githubusercontent.com%2Fsanity-io%2Fsanity-template-nextjs-clean%2Frefs%2Fheads%2Fmain%2Fsanity-next-preview.png&products=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22sanity%22%2C%22productSlug%22%3A%22project%22%2C%22protocol%22%3A%22other%22%7D%5D&root-directory=frontend
+A published case study never has a gap: missing required facts block publishing. In draft preview (Presentation in the Studio), each missing fact renders as a dashed `[PLACEHOLDER]` naming what belongs there, so the page shows what is still needed instead of an invented number. Optional sections with no content, such as untested Lighthouse scores, are left out of published pages entirely.
+
+## SEO
+
+- Every page has a title, description and canonical link. Case studies use their SEO fields, then fall back to the title, summary and hero screenshot.
+- JSON-LD: `Person` on the home page and `CreativeWork` on each case study, built only from Sanity fields.
+- `/sitemap.xml` lists published pages and case studies with their last edit dates; About and Resume appear once published.
+- `/robots.txt` allows crawling on production only. Preview deployments also send `noindex`, so they never show up in search.
+- Set `NEXT_PUBLIC_SITE_URL` in Vercel (Production) when the custom domain is live; until then the Vercel production URL is used.
+
+## Quality bar
+
+WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI (`.github/workflows/ci.yml`) on every push to every branch, so pull requests show the results:
+
+- **Checks:** Prettier, ESLint (site and Studio), TypeScript and the Studio validation tests.
+- **Browser tests:** Playwright on desktop and phone, against the production build. Every page in `sitemap.xml` is checked with axe for WCAG 2.2 AA in light and dark mode, plus one `h1`, no skipped heading levels, no sideways scroll, the skip link, the theme toggle with no flash, and 404s for unknown case studies.
+- **Lighthouse CI:** mobile, three runs per page, median score; any category under 95 fails. Reports are attached to each run.
+
+Pages come from the sitemap, so new case studies are tested as soon as they are published.
+
+Latest Lighthouse (mobile, local production build, Nov 9, 2026; Home and Contact, the published pages so far):
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 100   |
+| Accessibility  | 100   |
+| Best practices | 100   |
+| SEO            | 100   |
+
+## Decisions
+
+- Started from `sanity-io/sanity-template-nextjs-clean`, then removed the Post and Person types, the page builder and the Unsplash and AI media plugins. A fixed content model is faster and easier to test than a drag-and-drop one.
+- Kept the Settings singleton, Draft Mode, Visual Editing and Live Content wiring, since the real content model needs them.
+- Design system docs live in `docs/design-system/`; wireframes in `docs/wireframes/`.
+- Theme follows the system setting; the header toggle cycles System → Light → Dark. An inline script in `<head>` applies a saved choice before first paint, so there is no flash of the wrong theme.
+- Cross-field rules (client permission, test dates, live URL, date order) sit on a field that always has a value when the rule matters, and every custom rule ends in `.error()`. In testing against the real schema, rules on a whole object or document came back as warnings, and warnings don't block publishing. The same goes for `required()` on object fields (hero image, headline outcome, timeline), so a rule on the case study title lists any of those that are missing.
+- Case study screenshots go through `next-sanity/image`, which resizes on Sanity's image CDN instead of Vercel's image optimizer, keeping the Hobby plan's image quota free.
+- Geist and Geist Mono load through `next/font`, which self-hosts them at build time: no request to Google and no layout shift.

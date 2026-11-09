@@ -1,101 +1,148 @@
 import {defineQuery} from 'next-sanity'
 
-export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
-
-const postFields = /* groq */ `
-  _id,
-  "status": select(_originalId in path("drafts.**") => "draft", "published"),
-  "title": coalesce(title, "Untitled"),
-  "slug": slug.current,
-  excerpt,
-  coverImage,
-  "date": coalesce(date, _updatedAt),
-  "author": author->{firstName, lastName, picture},
-`
-
-const linkReference = /* groq */ `
-  _type == "link" => {
-    "page": page->slug.current,
-    "post": post->slug.current
-  }
-`
-
-const linkFields = /* groq */ `
-  link {
-      ...,
-      ${linkReference}
-      }
-`
-
-export const getPageQuery = defineQuery(`
-  *[_type == 'page' && slug.current == $slug][0]{
-    _id,
-    _type,
+/** The siteSettings singleton: identity, home hero and contact links. */
+export const siteSettingsQuery = defineQuery(`
+  *[_id == "siteSettings"][0]{
     name,
-    slug,
-    heading,
-    subheading,
-    "pageBuilder": pageBuilder[]{
-      ...,
-      _type == "callToAction" => {
-        ...,
-        button {
-          ...,
-          ${linkFields}
-        }
-      },
-      _type == "infoSection" => {
-        content[]{
-          ...,
-          markDefs[]{
-            ...,
-            ${linkReference}
-          }
-        }
-      },
-    },
+    jobTitle,
+    location,
+    workMode,
+    headline,
+    positioning,
+    email,
+    linkedInUrl,
+    githubUrl,
+    repoUrl,
+    seoDescription,
+    ogImage
   }
 `)
 
-export const sitemapData = defineQuery(`
-  *[_type == "page" || _type == "post" && defined(slug.current)] | order(_type asc) {
+/** Every case study slug, for generateStaticParams. */
+export const caseStudySlugsQuery = defineQuery(`
+  *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}
+`)
+
+/** One case study with its position in the list and the next one in order. */
+export const caseStudyQuery = defineQuery(`
+  *[_type == "caseStudy" && slug.current == $slug][0]{
+    _id,
+    title,
     "slug": slug.current,
-    _type,
-    _updatedAt,
+    summary,
+    status,
+    launchDate,
+    role,
+    stack,
+    timeline,
+    outcome,
+    liveUrl,
+    repoUrl,
+    heroImage,
+    proof,
+    metrics,
+    problem,
+    constraints,
+    decisions,
+    outcomeStory,
+    nextSteps,
+    gallery,
+    seo,
+    "author": *[_id == "siteSettings"][0].name,
+    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,
+    "total": count(*[_type == "caseStudy" && defined(slug.current)]),
+    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]
+      | order(order asc)[0]{title, "slug": slug.current}
   }
 `)
 
-export const allPostsQuery = defineQuery(`
-  *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) {
-    ${postFields}
-  }
-`)
-
-export const morePostsQuery = defineQuery(`
-  *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {
-    ${postFields}
-  }
-`)
-
-export const postQuery = defineQuery(`
-  *[_type == "post" && slug.current == $slug] [0] {
-    content[]{
-    ...,
-    markDefs[]{
-      ...,
-      ${linkReference}
+/** Everything the home page shows: hero, case study cards, stats and the About teaser. */
+export const homeQuery = defineQuery(`
+  {
+    "settings": *[_id == "siteSettings"][0]{
+      name,
+      jobTitle,
+      location,
+      email,
+      linkedInUrl,
+      githubUrl,
+      workMode,
+      headline,
+      positioning,
+      stats
+    },
+    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){
+      _id,
+      title,
+      "slug": slug.current,
+      summary,
+      status,
+      launchDate,
+      tag,
+      outcome,
+      heroImage
+    },
+    "about": *[_id == "about"][0]{
+      teaserTitle,
+      teaserText,
+      portrait
     }
-  },
-    ${postFields}
   }
 `)
 
-export const postPagesSlugs = defineQuery(`
-  *[_type == "post" && defined(slug.current)]
-  {"slug": slug.current}
+/**
+ * The About page singleton. The "path" field is aliased to pathEntries with an explicit
+ * projection: "path" is also a GROQ function name, and TypeGen mistypes it otherwise.
+ */
+export const aboutQuery = defineQuery(`
+  *[_id == "about"][0]{
+    headline,
+    intro,
+    story,
+    portrait,
+    "pathEntries": path[]{_key, period, title, detail},
+    pathNote
+  }
 `)
 
-export const pagesSlugs = defineQuery(`
-  *[_type == "page" && defined(slug.current)]
-  {"slug": slug.current}
+/** The web resume, plus the name and PDF from Site settings. */
+export const resumeQuery = defineQuery(`
+  {
+    "resume": *[_id == "resume"][0]{
+      tagline,
+      summary,
+      experience,
+      skills,
+      education
+    },
+    "settings": *[_id == "siteSettings"][0]{
+      name,
+      "pdf": resumePdf.asset->{url, size}
+    }
+  }
+`)
+
+/** Contact details from Site settings. */
+export const contactQuery = defineQuery(`
+  *[_id == "siteSettings"][0]{
+    availability,
+    email,
+    linkedInUrl,
+    githubUrl,
+    location,
+    timezone
+  }
+`)
+
+/** Published pages and case studies for sitemap.xml, with their last edit dates. */
+export const sitemapQuery = defineQuery(`
+  {
+    "settings": *[_id == "siteSettings"][0]._updatedAt,
+    "about": *[_id == "about"][0]._updatedAt,
+    "resume": *[_id == "resume"][0]._updatedAt,
+    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){
+      "slug": slug.current,
+      _updatedAt
+    }
+  }
 `)

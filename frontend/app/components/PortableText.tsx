@@ -1,109 +1,49 @@
+import {
+  PortableText as BasePortableText,
+  stegaClean,
+  type PortableTextBlock,
+  type PortableTextComponents,
+} from 'next-sanity'
+
+import type {RichText} from '@/sanity.types'
+
 /**
- * This component uses Portable Text to render a post body.
- *
- * You can learn more about Portable Text on:
- * https://www.sanity.io/docs/block-content
- * https://github.com/portabletext/react-portabletext
- * https://portabletext.org/
- *
+ * Renders Sanity rich text for case study sections and the About story. Section h2s come
+ * from the page, so the only heading editors can add is h3. Links are underlined so they
+ * don't rely on color alone. No colors, sizes or raw HTML from the CMS.
  */
-
-import {PortableText, type PortableTextComponents, type PortableTextBlock} from 'next-sanity'
-import ResolvedLink from '@/app/components/ResolvedLink'
-import Image from '@/app/components/SanityImage'
-
-export default function CustomPortableText({
-  className,
-  value,
-}: {
-  className?: string
-  value: PortableTextBlock[]
-}) {
-  const components: PortableTextComponents = {
-    types: {
-      image: ({value}) => {
-        if (!value?.asset?._ref) {
-          return null
-        }
-
-        return (
-          <figure className="my-8">
-            <Image
-              id={value.asset._ref}
-              alt={value.alt || ''}
-              width={672}
-              crop={value.crop}
-              mode="cover"
-              className="rounded-sm"
-            />
-          </figure>
-        )
-      },
-    },
-    block: {
-      h1: ({children, value}) => (
-        // Add an anchor to the h1
-        <h1 className="group relative">
+const components: PortableTextComponents = {
+  block: {
+    normal: ({children}) => <p>{children}</p>,
+    h3: ({children}) => <h3 className="mt-4 text-h3">{children}</h3>,
+  },
+  list: {
+    bullet: ({children}) => <ul className="flex list-disc flex-col gap-2 pl-5">{children}</ul>,
+    number: ({children}) => <ol className="flex list-decimal flex-col gap-2 pl-5">{children}</ol>,
+  },
+  marks: {
+    code: ({children}) => (
+      <code className="rounded-sm bg-surface px-1.5 py-px font-mono text-[0.9em]">{children}</code>
+    ),
+    link: ({children, value}) => {
+      const href = stegaClean((value as {href?: string} | undefined)?.href)
+      return href ? (
+        <a href={href} className="underline underline-offset-2">
           {children}
-          <a
-            href={`#${value?._key}`}
-            className="absolute left-0 top-0 bottom-0 -ml-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-              />
-            </svg>
-          </a>
-        </h1>
-      ),
-      h2: ({children, value}) => {
-        // Add an anchor to the h2
-        return (
-          <h2 className="group relative">
-            {children}
-            <a
-              href={`#${value?._key}`}
-              className="absolute left-0 top-0 bottom-0 -ml-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                />
-              </svg>
-            </a>
-          </h2>
-        )
-      },
+        </a>
+      ) : (
+        <>{children}</>
+      )
     },
-    marks: {
-      link: ({children, value: link}) => {
-        return <ResolvedLink link={link}>{children}</ResolvedLink>
-      },
-    },
-  }
+  },
+}
 
+export default function PortableText({value}: {value?: RichText | null}) {
+  if (!value?.length) return null
   return (
-    <div className={`prose-a:text-brand prose dark:prose-invert ${className}`}>
-      <PortableText components={components} value={value} />
+    <div className="flex max-w-reading flex-col gap-4">
+      {/* TypeGen marks span children optional; the renderer handles missing children safely. */}
+      <BasePortableText value={value as PortableTextBlock[]} components={components} />
     </div>
   )
 }

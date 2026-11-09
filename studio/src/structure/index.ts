@@ -1,29 +1,35 @@
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, DocumentPdfIcon, PresentationIcon, UserIcon} from '@sanity/icons'
+import type {ComponentType} from 'react'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
-import pluralize from 'pluralize-esm'
 
 /**
- * Structure builder is useful whenever you want to control how documents are grouped and
- * listed in the studio or for adding additional in-studio previews or content to documents.
+ * Studio navigation: the three singletons first, then case studies in site order.
  * Learn more: https://www.sanity.io/docs/structure-builder-introduction
  */
 
-const DISABLED_TYPES = ['settings', 'assist.instruction.context']
+// A singleton opens straight into its one document; its id is the type name.
+const singleton = (S: StructureBuilder, type: string, title: string, icon: ComponentType) =>
+  S.listItem()
+    .title(title)
+    .id(type)
+    .icon(icon)
+    .child(S.document().schemaType(type).documentId(type).title(title))
 
-export const structure: StructureResolver = (S: StructureBuilder) =>
+export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Website Content')
+    .title('Content')
     .items([
-      ...S.documentTypeListItems()
-        // Remove the "assist.instruction.context" and "settings" content  from the list of content types
-        .filter((listItem: any) => !DISABLED_TYPES.includes(listItem.getId()))
-        // Pluralize the title of each document type.  This is not required but just an option to consider.
-        .map((listItem) => {
-          return listItem.title(pluralize(listItem.getTitle() as string))
-        }),
-      // Settings Singleton in order to view/edit the one particular document for Settings.  Learn more about Singletons: https://www.sanity.io/docs/create-a-link-to-a-single-edit-page-in-your-main-document-type-list
+      singleton(S, 'siteSettings', 'Site settings', CogIcon),
+      singleton(S, 'about', 'About', UserIcon),
+      singleton(S, 'resume', 'Resume', DocumentPdfIcon),
+      S.divider(),
       S.listItem()
-        .title('Site Settings')
-        .child(S.document().schemaType('settings').documentId('siteSettings'))
-        .icon(CogIcon),
+        .title('Case studies')
+        .id('caseStudy')
+        .icon(PresentationIcon)
+        .child(
+          S.documentTypeList('caseStudy')
+            .title('Case studies')
+            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+        ),
     ])

@@ -1,96 +1,153 @@
-import {Suspense} from 'react'
+import type {Metadata} from 'next'
+import {draftMode} from 'next/headers'
+import {stegaClean} from 'next-sanity'
+import {Image} from 'next-sanity/image'
 import Link from 'next/link'
-import {PortableText} from '@portabletext/react'
 
-import {AllPosts} from '@/app/components/Posts'
-import GetStartedCode from '@/app/components/GetStartedCode'
-import SideBySideIcons from '@/app/components/SideBySideIcons'
-import {settingsQuery} from '@/sanity/lib/queries'
+import Button from '@/app/components/Button'
+import CaseStudyCard from '@/app/components/CaseStudyCard'
+import Placeholder from '@/app/components/Placeholder'
+import {formatMonthYear} from '@/lib/format'
+import {serializeJsonLd} from '@/lib/json-ld'
+import {absoluteUrl} from '@/lib/site-url'
+import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/live'
-import {dataAttr} from '@/sanity/lib/utils'
+import {homeQuery} from '@/sanity/lib/queries'
+import {urlForImage} from '@/sanity/lib/utils'
 
-export default async function Page() {
-  const {data: settings} = await sanityFetch({
-    query: settingsQuery,
-  })
+export const metadata: Metadata = {alternates: {canonical: '/'}}
+
+const container = 'mx-auto w-full max-w-page px-4 md:px-6'
+const WORK_MODE: Record<string, string> = {remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site'}
+
+/** Home: the headline, then the work in the first viewport, then stats and the About teaser. */
+export default async function HomePage() {
+  const [{data}, {isEnabled: preview}] = await Promise.all([
+    sanityFetch({query: homeQuery}),
+    draftMode(),
+  ])
+  const {settings, caseStudies, about} = data
+  const missing = (label: string) => (preview ? <Placeholder label={label} /> : null)
+
+  const metaLine = [
+    settings?.jobTitle,
+    settings?.location,
+    WORK_MODE[stegaClean(settings?.workMode) ?? ''],
+  ].filter(Boolean)
+
+  // Structured data for search engines: who this site is about. Facts come from Site settings.
+  const person = settings?.name
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        'name': settings.name,
+        'jobTitle': settings.jobTitle || undefined,
+        'url': absoluteUrl('/'),
+        'email': settings.email ? `mailto:${settings.email}` : undefined,
+        'address': settings.location || undefined,
+        'sameAs': [settings.linkedInUrl, settings.githubUrl].filter(Boolean),
+      }
+    : null
 
   return (
     <>
-      <div className="relative">
-        <div className="relative bg-[url(/images/tile-1-black.png)] bg-size-[5px]">
-          <div className="bg-gradient-to-b from-white w-full h-full absolute top-0"></div>
-          <div className="container">
-            <div className="relative min-h-[40vh] mx-auto max-w-2xl pt-10 xl:pt-20 pb-30 space-y-6 lg:max-w-4xl lg:px-12 flex flex-col items-center justify-center">
-              <div className="flex flex-col gap-4 items-center">
-                <div className="text-md leading-6 prose uppercase py-1 px-3 bg-white font-mono italic">
-                  A starter template for
-                </div>
-                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-black">
-                  <Link
-                    className="underline decoration-brand hover:text-brand underline-offset-8 hover:underline-offset-4 transition-all ease-out"
-                    href="https://sanity.io/"
-                  >
-                    Sanity
-                  </Link>
-                  +
-                  <Link
-                    className="underline decoration-black text-framework underline-offset-8 hover:underline-offset-4 transition-all ease-out"
-                    href="https://nextjs.org/"
-                  >
-                    Next.js
-                  </Link>
-                </h1>
-              </div>
-            </div>
-          </div>
+      {person && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{__html: serializeJsonLd(person)}}
+        />
+      )}
+      <section className={`${container} flex flex-col gap-5 pt-14 pb-12`}>
+        {metaLine.length > 0 && (
+          <p className="font-mono text-meta tracking-[0.02em] text-muted uppercase">
+            {metaLine.join(' · ')}
+          </p>
+        )}
+        <h1 className="max-w-[16em] text-display">{settings?.headline || demo.name}</h1>
+        {settings?.positioning && (
+          <p className="max-w-reading text-lead text-muted">{settings.positioning}</p>
+        )}
+        <div className="mt-2 flex flex-wrap gap-3">
+          <Button href="#work" variant="primary">
+            See the work
+          </Button>
+          <Button href="/resume">Resume</Button>
         </div>
-        <div className=" flex flex-col items-center">
-          <SideBySideIcons />
-          <div className="container relative mx-auto max-w-2xl pb-20 pt-10 space-y-6 lg:max-w-4xl lg:px-12 flex flex-col items-center">
-            <div className="prose sm:prose-lg md:prose-xl xl:prose-2xl text-gray-700 prose-a:text-gray-700 font-light text-center">
-              {settings?.description && (
-                <div
-                  data-sanity={dataAttr({
-                    id: settings._id,
-                    type: 'settings',
-                    path: 'description',
-                  }).toString()}
-                >
-                  <PortableText value={settings.description} />
-                </div>
+      </section>
+
+      <section
+        id="work"
+        aria-labelledby="work-heading"
+        className={`${container} flex flex-col gap-6 pb-16`}
+      >
+        <h2 id="work-heading" className="text-h2">
+          Selected work
+        </h2>
+        {caseStudies.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {caseStudies.map((study) => (
+              <CaseStudyCard key={study._id} {...study} preview={preview} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted">No case studies are published yet.</p>
+        )}
+      </section>
+
+      {settings?.stats?.length ? (
+        <section aria-label="At a glance" className={`${container} pb-18`}>
+          <dl className="grid grid-cols-2 border-y border-line md:grid-cols-4">
+            {settings.stats.map((stat) => (
+              <div key={stat._key} className="py-5 pr-4">
+                <dt className="font-mono text-label uppercase text-muted">{stat.label}</dt>
+                <dd className="mt-1 font-mono text-metric tabular-nums">{stat.value}</dd>
+                <dd className="mt-1 font-mono text-label font-normal text-muted">
+                  {[stat.source, formatMonthYear(stegaClean(stat.date))]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : preview ? (
+        <section aria-label="At a glance" className={`${container} pb-18`}>
+          <Placeholder label="Up to four numbers, each with a source and date" />
+        </section>
+      ) : null}
+
+      {about?.teaserTitle || preview ? (
+        <section aria-labelledby="about-heading" className="bg-surface">
+          <div className={`${container} flex flex-wrap items-center gap-10 py-16`}>
+            <div className="relative flex size-30 shrink-0 items-center justify-center overflow-hidden rounded-full">
+              {about?.portrait?.asset?._ref ? (
+                <Image
+                  src={urlForImage(about.portrait).url()}
+                  alt={stegaClean(about.portrait.alt) ?? ''}
+                  fill
+                  sizes="120px"
+                  className="object-cover"
+                />
+              ) : (
+                missing('Headshot')
               )}
-              <div className="flex items-center flex-col gap-4">
-                <GetStartedCode />
-                <Link
-                  href="https://www.sanity.io/docs"
-                  className="inline-flex text-brand text-xs md:text-sm underline hover:text-gray-900"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Sanity Documentation
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className="w-4 h-4 ml-1 inline"
-                    fill="currentColor"
-                  >
-                    <path d="M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V12L17.206 8.207L11.2071 14.2071L9.79289 12.7929L15.792 6.793L12 3H21Z"></path>
-                  </svg>
-                </Link>
-              </div>
+            </div>
+            <div className="flex min-w-0 flex-[999_1_30rem] flex-col gap-3">
+              <h2 id="about-heading" className="text-h2">
+                {about?.teaserTitle || missing('Teaser title')}
+              </h2>
+              {about?.teaserText ? (
+                <p className="max-w-reading text-muted">{about.teaserText}</p>
+              ) : (
+                missing('Teaser text')
+              )}
+              <Link href="/about" className="font-medium">
+                More about me
+              </Link>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="border-t border-gray-100 bg-gray-50">
-        <div className="container">
-          <aside className="py-12 sm:py-20">
-            <Suspense>
-              <AllPosts />
-            </Suspense>
-          </aside>
-        </div>
-      </div>
+        </section>
+      ) : null}
     </>
   )
 }

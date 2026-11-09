@@ -1,93 +1,115 @@
 import './globals.css'
 
+import {Analytics} from '@vercel/analytics/next'
 import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
-import {Inter, IBM_Plex_Mono} from 'next/font/google'
+import {Geist, Geist_Mono} from 'next/font/google'
 import {draftMode} from 'next/headers'
-import {toPlainText} from 'next-sanity'
 import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
 
 import DraftModeToast from '@/app/components/DraftModeToast'
-import Footer from '@/app/components/Footer'
-import Header from '@/app/components/Header'
+import SiteFooter from '@/app/components/SiteFooter'
+import SiteHeader from '@/app/components/SiteHeader'
+import SkipLink from '@/app/components/SkipLink'
+import {getSiteUrl, isProductionSite} from '@/lib/site-url'
+import {themeScript} from '@/lib/theme'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
-import {settingsQuery} from '@/sanity/lib/queries'
+import {siteSettingsQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
 import {handleError} from '@/app/client-utils'
 
 /**
- * Generate metadata for the page.
- * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
+ * Site-wide metadata. Pages override title and description with their own generateMetadata.
+ * stega: false keeps Visual Editing's invisible markers out of <title> and meta tags.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const {data: settings} = await sanityFetch({
-    query: settingsQuery,
-    // Metadata should never contain stega
-    stega: false,
-  })
-  const title = settings?.title || demo.title
-  const description = settings?.description || demo.description
-
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery, stega: false})
+  const name = settings?.name || demo.name
+  const title = settings?.jobTitle ? `${name}, ${settings.jobTitle}` : name
   const ogImage = resolveOpenGraphImage(settings?.ogImage)
-  let metadataBase: URL | undefined = undefined
-  try {
-    metadataBase = settings?.ogImage?.metadataBase
-      ? new URL(settings.ogImage.metadataBase)
-      : undefined
-  } catch {
-    // ignore
-  }
+
+  const description = settings?.seoDescription || settings?.positioning || undefined
+
   return {
-    metadataBase,
-    title: {
-      template: `%s | ${title}`,
-      default: title,
-    },
-    description: toPlainText(description),
+    // Relative URLs in metadata (canonical links, images) resolve against the site's origin.
+    metadataBase: getSiteUrl(),
+    title: {template: `%s | ${name}`, default: title},
+    description,
     openGraph: {
+      type: 'website',
+      siteName: name,
+      locale: 'en_US',
       images: ogImage ? [ogImage] : [],
     },
+    twitter: {card: 'summary_large_image'},
+    // Previews stay out of search results; robots.txt also blocks crawling there.
+    robots: isProductionSite() ? undefined : {index: false, follow: false},
   }
 }
 
-const inter = Inter({
-  variable: '--font-inter',
+const onVercel = Boolean(process.env.VERCEL)
+
+// next/font self-hosts Geist at build time: no request to Google, no layout shift.
+const geistSans = Geist({
+  variable: '--font-geist-sans',
   subsets: ['latin'],
   display: 'swap',
 })
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: '--font-ibm-plex-mono',
-  weight: ['400'],
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
   subsets: ['latin'],
   display: 'swap',
 })
 
 export default async function RootLayout({children}: LayoutProps<'/'>) {
   const {isEnabled: isDraftMode} = await draftMode()
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery})
 
   return (
-    <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable} bg-white text-black`}>
-      <body>
-        <section className="min-h-screen pt-24">
-          {/* The <Toaster> component is responsible for rendering toast notifications used in /app/client-utils.ts and /app/components/DraftModeToast.tsx */}
-          <Toaster />
-          {isDraftMode && (
-            <>
-              <DraftModeToast />
-              {/*  Enable Visual Editing, only to be rendered when Draft Mode is enabled */}
-              <VisualEditing />
-            </>
-          )}
-          {/* The <SanityLive> component is responsible for making all sanityFetch calls in your application live, so should always be rendered. */}
-          <SanityLive onError={handleError} />
-          <Header />
-          <main className="">{children}</main>
-          <Footer />
-        </section>
-        <SpeedInsights />
+    // suppressHydrationWarning: the head script may add data-theme before React hydrates.
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{__html: themeScript}} />
+      </head>
+      <body className="flex min-h-dvh flex-col">
+        <SkipLink />
+        <SiteHeader name={settings?.name || demo.name} />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter
+          name={settings?.name || demo.name}
+          email={settings?.email}
+          linkedInUrl={settings?.linkedInUrl}
+          githubUrl={settings?.githubUrl}
+          repoUrl={settings?.repoUrl}
+        />
+        {/* Toasts for Sanity Live errors (app/client-utils.ts) and Draft Mode (DraftModeToast). */}
+        <Toaster />
+        {isDraftMode && (
+          <>
+            <DraftModeToast />
+            {/* Visual Editing overlays, only while Draft Mode is on. */}
+            <VisualEditing />
+          </>
+        )}
+        {/* Makes every sanityFetch call live; always rendered. */}
+        <SanityLive onError={handleError} />
+        {/* Real-visitor analytics and Core Web Vitals. Their scripts exist only on Vercel,
+            so they are skipped locally and in CI, where they would 404. */}
+        {onVercel && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   )
