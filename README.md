@@ -2,7 +2,7 @@
 
 A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-Status: early build. Design tokens, the layout shell and the content model are in; pages arrive in later steps.
+Status: early build. Design tokens, the layout shell, the content model and the case study template (`/work/[slug]`) are in; Home, About, Resume and Contact come next.
 
 ## Stack
 
@@ -70,6 +70,10 @@ The Studio enforces the site's honesty rules. A document can't be published whil
 
 The rules live in `studio/src/schemaTypes/validation.ts` as plain functions with unit tests.
 
+### Drafts and placeholders
+
+A published case study never has a gap: missing required facts block publishing. In draft preview (Presentation in the Studio), each missing fact renders as a dashed `[PLACEHOLDER]` naming what belongs there, so the page shows what is still needed instead of an invented number. Optional sections with no content, such as untested Lighthouse scores, are left out of published pages entirely.
+
 ## Quality bar
 
 WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI once step 8 lands.
@@ -88,4 +92,5 @@ WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI once step 8 lan
 - Design system docs live in `docs/design-system/`; wireframes in `docs/wireframes/`.
 - Theme follows the system setting; the header toggle cycles System → Light → Dark. An inline script in `<head>` applies a saved choice before first paint, so there is no flash of the wrong theme.
 - Cross-field rules (client permission, test dates, live URL, date order) sit on a field that always has a value when the rule matters, and every custom rule ends in `.error()`. In testing against the real schema, rules on a whole object or document came back as warnings, and warnings don't block publishing.
+- Case study screenshots go through `next-sanity/image`, which resizes on Sanity's image CDN instead of Vercel's image optimizer, keeping the Hobby plan's image quota free.
 - Geist and Geist Mono load through `next/font`, which self-hosts them at build time: no request to Google and no layout shift.
