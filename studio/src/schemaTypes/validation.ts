@@ -94,3 +94,24 @@ export function liveUrlRequiredWhenLive(
   }
   return true
 }
+
+type CaseStudyObjects = {
+  heroImage?: {asset?: {_ref?: string} | null} | null
+  outcome?: {value?: string} | null
+  timeline?: {start?: string} | null
+}
+
+/**
+ * Object fields (images, metrics, the timeline) report a missing value only as a warning,
+ * even with .error(), and warnings don't block publishing. This check runs on the title,
+ * which every draft has, so their absence blocks publishing too.
+ */
+export function caseStudyObjectsRequired(doc: CaseStudyObjects | undefined): ValidationResult {
+  const missing = [
+    !doc?.heroImage?.asset?._ref && 'a hero screenshot',
+    !doc?.outcome?.value && 'the headline outcome',
+    !doc?.timeline?.start && 'a timeline start date',
+  ].filter(Boolean)
+  if (missing.length === 0) return true
+  return `Before publishing, add ${missing.join(', ')}.`
+}

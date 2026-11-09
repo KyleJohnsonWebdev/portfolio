@@ -3,6 +3,7 @@ import {describe, it} from 'node:test'
 
 import {
   altTextRequired,
+  caseStudyObjectsRequired,
   clientPermissionRequired,
   endNotBeforeStart,
   isLighthouseScore,
@@ -106,5 +107,31 @@ describe('liveUrlRequiredWhenLive', () => {
   })
   it('passes in-progress work without a URL', () => {
     assert.equal(liveUrlRequiredWhenLive(undefined, 'inProgress'), true)
+  })
+})
+
+describe('caseStudyObjectsRequired', () => {
+  it('lists every missing object field', () => {
+    const result = caseStudyObjectsRequired({})
+    assert.equal(typeof result, 'string')
+    assert.match(result as string, /hero screenshot.*headline outcome.*timeline/)
+  })
+  it('treats an image without an uploaded asset as missing', () => {
+    const result = caseStudyObjectsRequired({
+      heroImage: {asset: null},
+      outcome: {value: '98'},
+      timeline: {start: '2026-01-01'},
+    })
+    assert.equal(result, 'Before publishing, add a hero screenshot.')
+  })
+  it('passes when all three are present', () => {
+    assert.equal(
+      caseStudyObjectsRequired({
+        heroImage: {asset: {_ref: 'image-abc-1200x750-png'}},
+        outcome: {value: '98'},
+        timeline: {start: '2026-01-01'},
+      }),
+      true,
+    )
   })
 })

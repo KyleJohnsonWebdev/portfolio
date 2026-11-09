@@ -91,6 +91,6 @@ WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI once step 8 lan
 - Kept the Settings singleton, Draft Mode, Visual Editing and Live Content wiring, since the real content model needs them.
 - Design system docs live in `docs/design-system/`; wireframes in `docs/wireframes/`.
 - Theme follows the system setting; the header toggle cycles System → Light → Dark. An inline script in `<head>` applies a saved choice before first paint, so there is no flash of the wrong theme.
-- Cross-field rules (client permission, test dates, live URL, date order) sit on a field that always has a value when the rule matters, and every custom rule ends in `.error()`. In testing against the real schema, rules on a whole object or document came back as warnings, and warnings don't block publishing.
+- Cross-field rules (client permission, test dates, live URL, date order) sit on a field that always has a value when the rule matters, and every custom rule ends in `.error()`. In testing against the real schema, rules on a whole object or document came back as warnings, and warnings don't block publishing. The same goes for `required()` on object fields (hero image, headline outcome, timeline), so a rule on the case study title lists any of those that are missing.
 - Case study screenshots go through `next-sanity/image`, which resizes on Sanity's image CDN instead of Vercel's image optimizer, keeping the Hobby plan's image quota free.
 - Geist and Geist Mono load through `next/font`, which self-hosts them at build time: no request to Google and no layout shift.

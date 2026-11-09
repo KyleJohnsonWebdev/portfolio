@@ -1,7 +1,12 @@
 import {PresentationIcon} from '@sanity/icons'
 import {defineArrayMember, defineField, defineType} from 'sanity'
 
-import {clientPermissionRequired, endNotBeforeStart, liveUrlRequiredWhenLive} from '../validation'
+import {
+  caseStudyObjectsRequired,
+  clientPermissionRequired,
+  endNotBeforeStart,
+  liveUrlRequiredWhenLive,
+} from '../validation'
 
 /**
  * A case study. Fields follow the page order: TL;DR → Proof Strip → hero → problem →
@@ -38,7 +43,16 @@ export const caseStudy = defineType({
       type: 'string',
       group: 'overview',
       description: 'Usually the site name, e.g. "contextlayer.design".',
-      validation: (rule) => rule.required(),
+      validation: (rule) => [
+        rule.required(),
+        rule
+          .custom((_title, context) =>
+            caseStudyObjectsRequired(
+              context.document as Parameters<typeof caseStudyObjectsRequired>[0],
+            ),
+          )
+          .error(),
+      ],
     }),
     defineField({
       name: 'slug',
@@ -163,6 +177,7 @@ export const caseStudy = defineType({
       group: 'overview',
       description:
         'A real screenshot (or architecture sketch). Used in the browser frame and on the card.',
+      // Shows on the field; the title's rule is what blocks publishing (see validation.ts).
       validation: (rule) => rule.required().assetRequired(),
     }),
 
