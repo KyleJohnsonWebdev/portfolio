@@ -2,7 +2,7 @@
 
 A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-Status: all v1 pages are built: Home, case studies (`/work/[slug]`), About, Resume and Contact. SEO, structured data and CI gates come next.
+Status: all v1 pages are built, with SEO metadata, structured data, a sitemap and robots.txt. CI gates come next.
 
 ## Stack
 
@@ -73,6 +73,14 @@ The rules live in `studio/src/schemaTypes/validation.ts` as plain functions with
 ### Drafts and placeholders
 
 A published case study never has a gap: missing required facts block publishing. In draft preview (Presentation in the Studio), each missing fact renders as a dashed `[PLACEHOLDER]` naming what belongs there, so the page shows what is still needed instead of an invented number. Optional sections with no content, such as untested Lighthouse scores, are left out of published pages entirely.
+
+## SEO
+
+- Every page has a title, description and canonical link. Case studies use their SEO fields, then fall back to the title, summary and hero screenshot.
+- JSON-LD: `Person` on the home page and `CreativeWork` on each case study, built only from Sanity fields.
+- `/sitemap.xml` lists published pages and case studies with their last edit dates; About and Resume appear once published.
+- `/robots.txt` allows crawling on production only. Preview deployments also send `noindex`, so they never show up in search.
+- Set `NEXT_PUBLIC_SITE_URL` in Vercel (Production) when the custom domain is live; until then the Vercel production URL is used.
 
 ## Quality bar
 
