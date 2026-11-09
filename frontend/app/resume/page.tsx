@@ -13,7 +13,11 @@ import {resumeQuery} from '@/sanity/lib/queries'
 
 export async function generateMetadata(): Promise<Metadata> {
   const {data} = await sanityFetch({query: resumeQuery, stega: false})
-  return {title: 'Resume', description: data.resume?.summary || undefined}
+  return {
+    title: 'Resume',
+    description: data.resume?.summary || undefined,
+    alternates: {canonical: '/resume'},
+  }
 }
 
 /** "Jul 2017 – Present", "Mar 2020 – Sep 2022", or a label such as "7 years". */

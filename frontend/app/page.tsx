@@ -1,3 +1,4 @@
+import type {Metadata} from 'next'
 import {draftMode} from 'next/headers'
 import {stegaClean} from 'next-sanity'
 import {Image} from 'next-sanity/image'
@@ -7,10 +8,14 @@ import Button from '@/app/components/Button'
 import CaseStudyCard from '@/app/components/CaseStudyCard'
 import Placeholder from '@/app/components/Placeholder'
 import {formatMonthYear} from '@/lib/format'
+import {serializeJsonLd} from '@/lib/json-ld'
+import {absoluteUrl} from '@/lib/site-url'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/live'
 import {homeQuery} from '@/sanity/lib/queries'
 import {urlForImage} from '@/sanity/lib/utils'
+
+export const metadata: Metadata = {alternates: {canonical: '/'}}
 
 const container = 'mx-auto w-full max-w-page px-4 md:px-6'
 const WORK_MODE: Record<string, string> = {remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site'}
@@ -30,8 +35,28 @@ export default async function HomePage() {
     WORK_MODE[stegaClean(settings?.workMode) ?? ''],
   ].filter(Boolean)
 
+  // Structured data for search engines: who this site is about. Facts come from Site settings.
+  const person = settings?.name
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        'name': settings.name,
+        'jobTitle': settings.jobTitle || undefined,
+        'url': absoluteUrl('/'),
+        'email': settings.email ? `mailto:${settings.email}` : undefined,
+        'address': settings.location || undefined,
+        'sameAs': [settings.linkedInUrl, settings.githubUrl].filter(Boolean),
+      }
+    : null
+
   return (
     <>
+      {person && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{__html: serializeJsonLd(person)}}
+        />
+      )}
       <section className={`${container} flex flex-col gap-5 pt-14 pb-12`}>
         {metaLine.length > 0 && (
           <p className="font-mono text-meta tracking-[0.02em] text-muted uppercase">

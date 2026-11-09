@@ -472,7 +472,7 @@ export type CaseStudySlugsQueryResult = Array<{
 
 // Source: sanity/lib/queries.ts
 // Variable: caseStudyQuery
-// Query: *[_type == "caseStudy" && slug.current == $slug][0]{    _id,    title,    "slug": slug.current,    summary,    status,    launchDate,    role,    stack,    timeline,    outcome,    liveUrl,    repoUrl,    heroImage,    proof,    metrics,    problem,    constraints,    decisions,    outcomeStory,    nextSteps,    gallery,    seo,    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,    "total": count(*[_type == "caseStudy" && defined(slug.current)]),    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]      | order(order asc)[0]{title, "slug": slug.current}  }
+// Query: *[_type == "caseStudy" && slug.current == $slug][0]{    _id,    title,    "slug": slug.current,    summary,    status,    launchDate,    role,    stack,    timeline,    outcome,    liveUrl,    repoUrl,    heroImage,    proof,    metrics,    problem,    constraints,    decisions,    outcomeStory,    nextSteps,    gallery,    seo,    "author": *[_id == "siteSettings"][0].name,    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,    "total": count(*[_type == "caseStudy" && defined(slug.current)]),    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]      | order(order asc)[0]{title, "slug": slug.current}  }
 export type CaseStudyQueryResult = {
   _id: string
   title: string
@@ -511,6 +511,7 @@ export type CaseStudyQueryResult = {
     } & AccessibleImage
   > | null
   seo: Seo | null
+  author: null | string
   position: number
   total: number
   next: {
@@ -521,28 +522,40 @@ export type CaseStudyQueryResult = {
 
 // Source: sanity/lib/queries.ts
 // Variable: homeQuery
-// Query: {    "settings": *[_id == "siteSettings"][0]{      jobTitle,      location,      workMode,      headline,      positioning,      stats    },    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){      _id,      title,      "slug": slug.current,      summary,      status,      launchDate,      tag,      outcome,      heroImage    },    "about": *[_id == "about"][0]{      teaserTitle,      teaserText,      portrait    }  }
+// Query: {    "settings": *[_id == "siteSettings"][0]{      name,      jobTitle,      location,      email,      linkedInUrl,      githubUrl,      workMode,      headline,      positioning,      stats    },    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){      _id,      title,      "slug": slug.current,      summary,      status,      launchDate,      tag,      outcome,      heroImage    },    "about": *[_id == "about"][0]{      teaserTitle,      teaserText,      portrait    }  }
 export type HomeQueryResult = {
   settings:
     | {
+        name: null
         jobTitle: null
         location: null
+        email: null
+        linkedInUrl: null
+        githubUrl: null
         workMode: null
         headline: null
         positioning: null
         stats: null
       }
     | {
+        name: null
         jobTitle: null
         location: null
+        email: null
+        linkedInUrl: null
+        githubUrl: null
         workMode: null
         headline: string
         positioning: null
         stats: null
       }
     | {
+        name: string
         jobTitle: string
         location: string | null
+        email: string
+        linkedInUrl: string
+        githubUrl: string
         workMode: 'hybrid' | 'onsite' | 'remote' | null
         headline: string
         positioning: string
@@ -689,16 +702,30 @@ export type ContactQueryResult =
     }
   | null
 
+// Source: sanity/lib/queries.ts
+// Variable: sitemapQuery
+// Query: {    "settings": *[_id == "siteSettings"][0]._updatedAt,    "about": *[_id == "about"][0]._updatedAt,    "resume": *[_id == "resume"][0]._updatedAt,    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){      "slug": slug.current,      _updatedAt    }  }
+export type SitemapQueryResult = {
+  settings: string | null
+  about: string | null
+  resume: string | null
+  caseStudies: Array<{
+    slug: string
+    _updatedAt: string
+  }>
+}
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
     '\n  *[_id == "siteSettings"][0]{\n    name,\n    jobTitle,\n    location,\n    workMode,\n    headline,\n    positioning,\n    email,\n    linkedInUrl,\n    githubUrl,\n    repoUrl,\n    seoDescription,\n    ogImage\n  }\n': SiteSettingsQueryResult
     '\n  *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}\n': CaseStudySlugsQueryResult
-    '\n  *[_type == "caseStudy" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    summary,\n    status,\n    launchDate,\n    role,\n    stack,\n    timeline,\n    outcome,\n    liveUrl,\n    repoUrl,\n    heroImage,\n    proof,\n    metrics,\n    problem,\n    constraints,\n    decisions,\n    outcomeStory,\n    nextSteps,\n    gallery,\n    seo,\n    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,\n    "total": count(*[_type == "caseStudy" && defined(slug.current)]),\n    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]\n      | order(order asc)[0]{title, "slug": slug.current}\n  }\n': CaseStudyQueryResult
-    '\n  {\n    "settings": *[_id == "siteSettings"][0]{\n      jobTitle,\n      location,\n      workMode,\n      headline,\n      positioning,\n      stats\n    },\n    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){\n      _id,\n      title,\n      "slug": slug.current,\n      summary,\n      status,\n      launchDate,\n      tag,\n      outcome,\n      heroImage\n    },\n    "about": *[_id == "about"][0]{\n      teaserTitle,\n      teaserText,\n      portrait\n    }\n  }\n': HomeQueryResult
+    '\n  *[_type == "caseStudy" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    summary,\n    status,\n    launchDate,\n    role,\n    stack,\n    timeline,\n    outcome,\n    liveUrl,\n    repoUrl,\n    heroImage,\n    proof,\n    metrics,\n    problem,\n    constraints,\n    decisions,\n    outcomeStory,\n    nextSteps,\n    gallery,\n    seo,\n    "author": *[_id == "siteSettings"][0].name,\n    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,\n    "total": count(*[_type == "caseStudy" && defined(slug.current)]),\n    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]\n      | order(order asc)[0]{title, "slug": slug.current}\n  }\n': CaseStudyQueryResult
+    '\n  {\n    "settings": *[_id == "siteSettings"][0]{\n      name,\n      jobTitle,\n      location,\n      email,\n      linkedInUrl,\n      githubUrl,\n      workMode,\n      headline,\n      positioning,\n      stats\n    },\n    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){\n      _id,\n      title,\n      "slug": slug.current,\n      summary,\n      status,\n      launchDate,\n      tag,\n      outcome,\n      heroImage\n    },\n    "about": *[_id == "about"][0]{\n      teaserTitle,\n      teaserText,\n      portrait\n    }\n  }\n': HomeQueryResult
     '\n  *[_id == "about"][0]{\n    headline,\n    intro,\n    story,\n    portrait,\n    "pathEntries": path[]{_key, period, title, detail},\n    pathNote\n  }\n': AboutQueryResult
     '\n  {\n    "resume": *[_id == "resume"][0]{\n      tagline,\n      summary,\n      experience,\n      skills,\n      education\n    },\n    "settings": *[_id == "siteSettings"][0]{\n      name,\n      "pdf": resumePdf.asset->{url, size}\n    }\n  }\n': ResumeQueryResult
     '\n  *[_id == "siteSettings"][0]{\n    availability,\n    email,\n    linkedInUrl,\n    githubUrl,\n    location,\n    timezone\n  }\n': ContactQueryResult
+    '\n  {\n    "settings": *[_id == "siteSettings"][0]._updatedAt,\n    "about": *[_id == "about"][0]._updatedAt,\n    "resume": *[_id == "resume"][0]._updatedAt,\n    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){\n      "slug": slug.current,\n      _updatedAt\n    }\n  }\n': SitemapQueryResult
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

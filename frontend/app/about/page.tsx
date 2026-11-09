@@ -12,7 +12,11 @@ import {urlForImage} from '@/sanity/lib/utils'
 
 export async function generateMetadata(): Promise<Metadata> {
   const {data: about} = await sanityFetch({query: aboutQuery, stega: false})
-  return {title: 'About', description: about?.intro || undefined}
+  return {
+    title: 'About',
+    description: about?.intro || undefined,
+    alternates: {canonical: '/about'},
+  }
 }
 
 const container = 'mx-auto w-full max-w-page px-4 md:px-6'

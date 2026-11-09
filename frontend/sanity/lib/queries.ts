@@ -48,6 +48,7 @@ export const caseStudyQuery = defineQuery(`
     nextSteps,
     gallery,
     seo,
+    "author": *[_id == "siteSettings"][0].name,
     "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,
     "total": count(*[_type == "caseStudy" && defined(slug.current)]),
     "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]
@@ -59,8 +60,12 @@ export const caseStudyQuery = defineQuery(`
 export const homeQuery = defineQuery(`
   {
     "settings": *[_id == "siteSettings"][0]{
+      name,
       jobTitle,
       location,
+      email,
+      linkedInUrl,
+      githubUrl,
       workMode,
       headline,
       positioning,
@@ -126,5 +131,18 @@ export const contactQuery = defineQuery(`
     githubUrl,
     location,
     timezone
+  }
+`)
+
+/** Published pages and case studies for sitemap.xml, with their last edit dates. */
+export const sitemapQuery = defineQuery(`
+  {
+    "settings": *[_id == "siteSettings"][0]._updatedAt,
+    "about": *[_id == "about"][0]._updatedAt,
+    "resume": *[_id == "resume"][0]._updatedAt,
+    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){
+      "slug": slug.current,
+      _updatedAt
+    }
   }
 `)

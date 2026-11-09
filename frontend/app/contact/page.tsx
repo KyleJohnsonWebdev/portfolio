@@ -6,7 +6,11 @@ import {contactQuery} from '@/sanity/lib/queries'
 
 export async function generateMetadata(): Promise<Metadata> {
   const {data} = await sanityFetch({query: contactQuery, stega: false})
-  return {title: 'Contact', description: data?.availability || undefined}
+  return {
+    title: 'Contact',
+    description: data?.availability || undefined,
+    alternates: {canonical: '/contact'},
+  }
 }
 
 /**
