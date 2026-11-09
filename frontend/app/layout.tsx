@@ -11,6 +11,7 @@ import DraftModeToast from '@/app/components/DraftModeToast'
 import SiteFooter from '@/app/components/SiteFooter'
 import SiteHeader from '@/app/components/SiteHeader'
 import SkipLink from '@/app/components/SkipLink'
+import {getSiteUrl, isProductionSite} from '@/lib/site-url'
 import {themeScript} from '@/lib/theme'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
@@ -28,10 +29,22 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = settings?.jobTitle ? `${name}, ${settings.jobTitle}` : name
   const ogImage = resolveOpenGraphImage(settings?.ogImage)
 
+  const description = settings?.seoDescription || settings?.positioning || undefined
+
   return {
+    // Relative URLs in metadata (canonical links, images) resolve against the site's origin.
+    metadataBase: getSiteUrl(),
     title: {template: `%s | ${name}`, default: title},
-    description: settings?.seoDescription || settings?.positioning || undefined,
-    openGraph: {images: ogImage ? [ogImage] : []},
+    description,
+    openGraph: {
+      type: 'website',
+      siteName: name,
+      locale: 'en_US',
+      images: ogImage ? [ogImage] : [],
+    },
+    twitter: {card: 'summary_large_image'},
+    // Previews stay out of search results; robots.txt also blocks crawling there.
+    robots: isProductionSite() ? undefined : {index: false, follow: false},
   }
 }
 
