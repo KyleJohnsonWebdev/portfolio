@@ -8,7 +8,7 @@ Status: early build. Design tokens, fonts and the layout shell are in; schemas a
 
 - Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict)
 - Tailwind CSS v4
-- Sanity v5 Studio with `next-sanity`, Visual Editing and Live Content
+- Sanity v6 Studio with `next-sanity`, Visual Editing and Live Content
 - Sanity TypeGen for typed GROQ queries
 - Vercel (site, Analytics, Speed Insights)
 - npm workspaces + Turborepo: `frontend/` (the site) and `studio/` (Sanity Studio)
