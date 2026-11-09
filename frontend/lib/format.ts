@@ -31,3 +31,10 @@ export function displayHost(url: string | null | undefined): string | null {
     return null
   }
 }
+
+/** File size for download links: "84 KB", "1.2 MB". */
+export function formatFileSize(bytes: number | null | undefined): string | null {
+  if (!bytes || bytes < 0) return null
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
