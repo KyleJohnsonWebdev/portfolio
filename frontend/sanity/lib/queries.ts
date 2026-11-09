@@ -84,3 +84,47 @@ export const homeQuery = defineQuery(`
     }
   }
 `)
+
+/**
+ * The About page singleton. The "path" field is aliased to pathEntries with an explicit
+ * projection: "path" is also a GROQ function name, and TypeGen mistypes it otherwise.
+ */
+export const aboutQuery = defineQuery(`
+  *[_id == "about"][0]{
+    headline,
+    intro,
+    story,
+    portrait,
+    "pathEntries": path[]{_key, period, title, detail},
+    pathNote
+  }
+`)
+
+/** The web resume, plus the name and PDF from Site settings. */
+export const resumeQuery = defineQuery(`
+  {
+    "resume": *[_id == "resume"][0]{
+      tagline,
+      summary,
+      experience,
+      skills,
+      education
+    },
+    "settings": *[_id == "siteSettings"][0]{
+      name,
+      "pdf": resumePdf.asset->{url, size}
+    }
+  }
+`)
+
+/** Contact details from Site settings. */
+export const contactQuery = defineQuery(`
+  *[_id == "siteSettings"][0]{
+    availability,
+    email,
+    linkedInUrl,
+    githubUrl,
+    location,
+    timezone
+  }
+`)
