@@ -1,5 +1,6 @@
 import './globals.css'
 
+import {Analytics} from '@vercel/analytics/next'
 import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
 import {Geist, Geist_Mono} from 'next/font/google'
@@ -47,6 +48,8 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: isProductionSite() ? undefined : {index: false, follow: false},
   }
 }
+
+const onVercel = Boolean(process.env.VERCEL)
 
 // next/font self-hosts Geist at build time: no request to Google, no layout shift.
 const geistSans = Geist({
@@ -99,7 +102,14 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
         )}
         {/* Makes every sanityFetch call live; always rendered. */}
         <SanityLive onError={handleError} />
-        <SpeedInsights />
+        {/* Real-visitor analytics and Core Web Vitals. Their scripts exist only on Vercel,
+            so they are skipped locally and in CI, where they would 404. */}
+        {onVercel && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   )
