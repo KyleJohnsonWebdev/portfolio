@@ -13,7 +13,8 @@
     "dev:studio": "npm run dev --workspace=studio",
     "format": "prettier --cache --write .",
     "lint": "npm run lint --workspace=frontend",
-    "type-check": "npm run type-check --workspaces"
+    "type-check": "npm run type-check --workspaces",
+    "test": "npm run test --workspace=studio"
   },
   "prettier": "@sanity/prettier-config",
   "devDependencies": {
