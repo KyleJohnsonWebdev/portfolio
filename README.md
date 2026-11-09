@@ -2,7 +2,7 @@
 
 A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-Status: all v1 pages are built, with SEO metadata, structured data, a sitemap and robots.txt. CI gates come next.
+Status: all v1 pages are built, with SEO metadata and CI quality gates. Next: publish two finished case studies and ship v1.
 
 ## Stack
 
@@ -28,13 +28,16 @@ npm run dev
 
 Other scripts, all from the repo root:
 
-| Command              | What it does                                     |
-| -------------------- | ------------------------------------------------ |
-| `npm run build`      | Builds the site and the Studio through Turborepo |
-| `npm run type-check` | Runs `tsc` in both workspaces                    |
-| `npm run lint`       | Lints the frontend                               |
-| `npm test`           | Runs the Studio's validation rule tests          |
-| `npm run format`     | Formats the repo with Prettier                   |
+| Command                          | What it does                                                       |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `npm run build`                  | Builds the site and the Studio through Turborepo                   |
+| `npm run type-check`             | Runs `tsc` in both workspaces                                      |
+| `npm run lint`                   | Lints the site and the Studio                                      |
+| `npm test`                       | Runs the Studio's validation rule tests                            |
+| `npm run format:check`           | Fails on unformatted files (what CI runs)                          |
+| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)             |
+| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (after `npm run build`) |
+| `npm run format`                 | Formats the repo with Prettier                                     |
 
 The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never commit `.env*` files.
 
@@ -84,14 +87,22 @@ A published case study never has a gap: missing required facts block publishing.
 
 ## Quality bar
 
-WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI once step 8 lands.
+WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI (`.github/workflows/ci.yml`) on every push to every branch, so pull requests show the results:
 
-| Category       | Score            |
-| -------------- | ---------------- |
-| Performance    | Not measured yet |
-| Accessibility  | Not measured yet |
-| Best practices | Not measured yet |
-| SEO            | Not measured yet |
+- **Checks:** Prettier, ESLint (site and Studio), TypeScript and the Studio validation tests.
+- **Browser tests:** Playwright on desktop and phone, against the production build. Every page in `sitemap.xml` is checked with axe for WCAG 2.2 AA in light and dark mode, plus one `h1`, no skipped heading levels, no sideways scroll, the skip link, the theme toggle with no flash, and 404s for unknown case studies.
+- **Lighthouse CI:** mobile, three runs per page, median score; any category under 95 fails. Reports are attached to each run.
+
+Pages come from the sitemap, so new case studies are tested as soon as they are published.
+
+Latest Lighthouse (mobile, local production build, Nov 9, 2026; Home and Contact, the published pages so far):
+
+| Category       | Score |
+| -------------- | ----- |
+| Performance    | 100   |
+| Accessibility  | 100   |
+| Best practices | 100   |
+| SEO            | 100   |
 
 ## Decisions
 
