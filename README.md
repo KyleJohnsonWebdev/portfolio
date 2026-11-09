@@ -2,7 +2,7 @@
 
 A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-Status: early build. Design tokens, the layout shell, the content model, the case study template (`/work/[slug]`) and the home page are in; About, Resume and Contact come next.
+Status: all v1 pages are built: Home, case studies (`/work/[slug]`), About, Resume and Contact. SEO, structured data and CI gates come next.
 
 ## Stack
 
