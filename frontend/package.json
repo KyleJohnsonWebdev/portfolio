@@ -6,12 +6,14 @@
     "build": "next build",
     "predev": "npm run sanity:typegen",
     "dev": "next dev",
+    "lighthouse": "node scripts/lighthouse.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "sanity:typegen": "cd ../studio && sanity schema extract --force --enforce-required-fields --path ../sanity.schema.json && cd ../frontend && sanity typegen generate",
     "start": "next start",
-    "type-check": "next typegen && tsc --noEmit",
-    "tokens": "node scripts/build-tokens.mjs"
+    "test:e2e": "playwright test",
+    "tokens": "node scripts/build-tokens.mjs",
+    "type-check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@sanity/client": "^8.15.0",
@@ -29,6 +31,9 @@
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "^0.16.0",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^22.19.19",
     "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
