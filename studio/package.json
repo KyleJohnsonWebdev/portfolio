@@ -12,17 +12,17 @@
     "deploy": "sanity deploy",
     "predev": "npm run sanity:typegen",
     "dev": "sanity dev",
-    "sanity:typegen": "sanity schema extract --enforce-required-fields --path ../sanity.schema.json && sanity typegen generate",
+    "sanity:typegen": "sanity schema extract --force --enforce-required-fields --path ../sanity.schema.json && sanity typegen generate",
     "start": "sanity start",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@sanity/icons": "^3.7.4",
-    "@sanity/vision": "^5.31.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
+    "@sanity/vision": "^6.22.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "rxjs": "^7.8.2",
-    "sanity": "^5.31.1",
+    "sanity": "^6.22.0",
     "styled-components": "^6.4.2"
   },
   "devDependencies": {
