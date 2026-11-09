@@ -519,12 +519,72 @@ export type CaseStudyQueryResult = {
   } | null
 } | null
 
+// Source: sanity/lib/queries.ts
+// Variable: homeQuery
+// Query: {    "settings": *[_id == "siteSettings"][0]{      jobTitle,      location,      workMode,      headline,      positioning,      stats    },    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){      _id,      title,      "slug": slug.current,      summary,      status,      launchDate,      tag,      outcome,      heroImage    },    "about": *[_id == "about"][0]{      teaserTitle,      teaserText,      portrait    }  }
+export type HomeQueryResult = {
+  settings:
+    | {
+        jobTitle: null
+        location: null
+        workMode: null
+        headline: null
+        positioning: null
+        stats: null
+      }
+    | {
+        jobTitle: null
+        location: null
+        workMode: null
+        headline: string
+        positioning: null
+        stats: null
+      }
+    | {
+        jobTitle: string
+        location: string | null
+        workMode: 'hybrid' | 'onsite' | 'remote' | null
+        headline: string
+        positioning: string
+        stats: Array<
+          {
+            _key: string
+          } & Metric
+        > | null
+      }
+    | null
+  caseStudies: Array<{
+    _id: string
+    title: string
+    slug: string
+    summary: string
+    status: 'inProgress' | 'live'
+    launchDate: string | null
+    tag: string | null
+    outcome: Metric
+    heroImage: AccessibleImage
+  }>
+  about:
+    | {
+        teaserTitle: null
+        teaserText: null
+        portrait: null
+      }
+    | {
+        teaserTitle: string
+        teaserText: string
+        portrait: AccessibleImage | null
+      }
+    | null
+}
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
     '\n  *[_id == "siteSettings"][0]{\n    name,\n    jobTitle,\n    location,\n    workMode,\n    headline,\n    positioning,\n    email,\n    linkedInUrl,\n    githubUrl,\n    repoUrl,\n    seoDescription,\n    ogImage\n  }\n': SiteSettingsQueryResult
     '\n  *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}\n': CaseStudySlugsQueryResult
     '\n  *[_type == "caseStudy" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    summary,\n    status,\n    launchDate,\n    role,\n    stack,\n    timeline,\n    outcome,\n    liveUrl,\n    repoUrl,\n    heroImage,\n    proof,\n    metrics,\n    problem,\n    constraints,\n    decisions,\n    outcomeStory,\n    nextSteps,\n    gallery,\n    seo,\n    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,\n    "total": count(*[_type == "caseStudy" && defined(slug.current)]),\n    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]\n      | order(order asc)[0]{title, "slug": slug.current}\n  }\n': CaseStudyQueryResult
+    '\n  {\n    "settings": *[_id == "siteSettings"][0]{\n      jobTitle,\n      location,\n      workMode,\n      headline,\n      positioning,\n      stats\n    },\n    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){\n      _id,\n      title,\n      "slug": slug.current,\n      summary,\n      status,\n      launchDate,\n      tag,\n      outcome,\n      heroImage\n    },\n    "about": *[_id == "about"][0]{\n      teaserTitle,\n      teaserText,\n      portrait\n    }\n  }\n': HomeQueryResult
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

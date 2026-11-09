@@ -54,3 +54,33 @@ export const caseStudyQuery = defineQuery(`
       | order(order asc)[0]{title, "slug": slug.current}
   }
 `)
+
+/** Everything the home page shows: hero, case study cards, stats and the About teaser. */
+export const homeQuery = defineQuery(`
+  {
+    "settings": *[_id == "siteSettings"][0]{
+      jobTitle,
+      location,
+      workMode,
+      headline,
+      positioning,
+      stats
+    },
+    "caseStudies": *[_type == "caseStudy" && defined(slug.current)] | order(order asc){
+      _id,
+      title,
+      "slug": slug.current,
+      summary,
+      status,
+      launchDate,
+      tag,
+      outcome,
+      heroImage
+    },
+    "about": *[_id == "about"][0]{
+      teaserTitle,
+      teaserText,
+      portrait
+    }
+  }
+`)
