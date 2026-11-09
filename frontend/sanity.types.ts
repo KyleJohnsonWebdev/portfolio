@@ -463,10 +463,68 @@ export type SiteSettingsQueryResult =
     }
   | null
 
+// Source: sanity/lib/queries.ts
+// Variable: caseStudySlugsQuery
+// Query: *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}
+export type CaseStudySlugsQueryResult = Array<{
+  slug: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: caseStudyQuery
+// Query: *[_type == "caseStudy" && slug.current == $slug][0]{    _id,    title,    "slug": slug.current,    summary,    status,    launchDate,    role,    stack,    timeline,    outcome,    liveUrl,    repoUrl,    heroImage,    proof,    metrics,    problem,    constraints,    decisions,    outcomeStory,    nextSteps,    gallery,    seo,    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,    "total": count(*[_type == "caseStudy" && defined(slug.current)]),    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]      | order(order asc)[0]{title, "slug": slug.current}  }
+export type CaseStudyQueryResult = {
+  _id: string
+  title: string
+  slug: string
+  summary: string
+  status: 'inProgress' | 'live'
+  launchDate: string | null
+  role: string
+  stack: Array<string>
+  timeline: {
+    start: string
+    end?: string
+  }
+  outcome: Metric
+  liveUrl: string | null
+  repoUrl: string | null
+  heroImage: AccessibleImage
+  proof: LighthouseProof | null
+  metrics: Array<
+    {
+      _key: string
+    } & Metric
+  > | null
+  problem: RichText
+  constraints: Array<string>
+  decisions: Array<
+    {
+      _key: string
+    } & Decision
+  >
+  outcomeStory: RichText
+  nextSteps: RichText | null
+  gallery: Array<
+    {
+      _key: string
+    } & AccessibleImage
+  > | null
+  seo: Seo | null
+  position: number
+  total: number
+  next: {
+    title: string
+    slug: string
+  } | null
+} | null
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
     '\n  *[_id == "siteSettings"][0]{\n    name,\n    jobTitle,\n    location,\n    workMode,\n    headline,\n    positioning,\n    email,\n    linkedInUrl,\n    githubUrl,\n    repoUrl,\n    seoDescription,\n    ogImage\n  }\n': SiteSettingsQueryResult
+    '\n  *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}\n': CaseStudySlugsQueryResult
+    '\n  *[_type == "caseStudy" && slug.current == $slug][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    summary,\n    status,\n    launchDate,\n    role,\n    stack,\n    timeline,\n    outcome,\n    liveUrl,\n    repoUrl,\n    heroImage,\n    proof,\n    metrics,\n    problem,\n    constraints,\n    decisions,\n    outcomeStory,\n    nextSteps,\n    gallery,\n    seo,\n    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,\n    "total": count(*[_type == "caseStudy" && defined(slug.current)]),\n    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]\n      | order(order asc)[0]{title, "slug": slug.current}\n  }\n': CaseStudyQueryResult
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

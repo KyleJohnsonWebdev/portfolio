@@ -17,3 +17,40 @@ export const siteSettingsQuery = defineQuery(`
     ogImage
   }
 `)
+
+/** Every case study slug, for generateStaticParams. */
+export const caseStudySlugsQuery = defineQuery(`
+  *[_type == "caseStudy" && defined(slug.current)]{"slug": slug.current}
+`)
+
+/** One case study with its position in the list and the next one in order. */
+export const caseStudyQuery = defineQuery(`
+  *[_type == "caseStudy" && slug.current == $slug][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    summary,
+    status,
+    launchDate,
+    role,
+    stack,
+    timeline,
+    outcome,
+    liveUrl,
+    repoUrl,
+    heroImage,
+    proof,
+    metrics,
+    problem,
+    constraints,
+    decisions,
+    outcomeStory,
+    nextSteps,
+    gallery,
+    seo,
+    "position": count(*[_type == "caseStudy" && defined(slug.current) && order < ^.order]) + 1,
+    "total": count(*[_type == "caseStudy" && defined(slug.current)]),
+    "next": *[_type == "caseStudy" && defined(slug.current) && order > ^.order]
+      | order(order asc)[0]{title, "slug": slug.current}
+  }
+`)
