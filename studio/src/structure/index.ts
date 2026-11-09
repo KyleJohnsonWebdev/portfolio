@@ -1,24 +1,35 @@
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, DocumentPdfIcon, PresentationIcon, UserIcon} from '@sanity/icons'
+import type {ComponentType} from 'react'
 import type {StructureBuilder, StructureResolver} from 'sanity/structure'
 
 /**
- * Structure builder controls how documents are grouped and listed in the Studio.
+ * Studio navigation: the three singletons first, then case studies in site order.
  * Learn more: https://www.sanity.io/docs/structure-builder-introduction
  */
 
-const SINGLETON_TYPES = ['settings']
+// A singleton opens straight into its one document; its id is the type name.
+const singleton = (S: StructureBuilder, type: string, title: string, icon: ComponentType) =>
+  S.listItem()
+    .title(title)
+    .id(type)
+    .icon(icon)
+    .child(S.document().schemaType(type).documentId(type).title(title))
 
-export const structure: StructureResolver = (S: StructureBuilder) =>
+export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Website Content')
+    .title('Content')
     .items([
-      // Document types that are not singletons (none yet; step 3 adds caseStudy).
-      ...S.documentTypeListItems().filter(
-        (listItem) => !SINGLETON_TYPES.includes(listItem.getId()!),
-      ),
-      // Settings singleton: one fixed document id, so editors never create a second one.
+      singleton(S, 'siteSettings', 'Site settings', CogIcon),
+      singleton(S, 'about', 'About', UserIcon),
+      singleton(S, 'resume', 'Resume', DocumentPdfIcon),
+      S.divider(),
       S.listItem()
-        .title('Site Settings')
-        .child(S.document().schemaType('settings').documentId('siteSettings'))
-        .icon(CogIcon),
+        .title('Case studies')
+        .id('caseStudy')
+        .icon(PresentationIcon)
+        .child(
+          S.documentTypeList('caseStudy')
+            .title('Case studies')
+            .defaultOrdering([{field: 'order', direction: 'asc'}]),
+        ),
     ])

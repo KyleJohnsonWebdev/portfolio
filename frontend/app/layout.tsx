@@ -4,7 +4,6 @@ import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
 import {Geist, Geist_Mono} from 'next/font/google'
 import {draftMode} from 'next/headers'
-import {toPlainText} from 'next-sanity'
 import {VisualEditing} from 'next-sanity/visual-editing'
 import {Toaster} from 'sonner'
 
@@ -15,42 +14,24 @@ import SkipLink from '@/app/components/SkipLink'
 import {themeScript} from '@/lib/theme'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
-import {settingsQuery} from '@/sanity/lib/queries'
+import {siteSettingsQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
 import {handleError} from '@/app/client-utils'
 
 /**
- * Generate metadata for the page.
- * Learn more: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
+ * Site-wide metadata. Pages override title and description with their own generateMetadata.
+ * stega: false keeps Visual Editing's invisible markers out of <title> and meta tags.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const {data: settings} = await sanityFetch({
-    query: settingsQuery,
-    // Metadata should never contain stega
-    stega: false,
-  })
-  const title = settings?.title || demo.title
-  const description = settings?.description ? toPlainText(settings.description) : demo.description
-
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery, stega: false})
+  const name = settings?.name || demo.name
+  const title = settings?.jobTitle ? `${name}, ${settings.jobTitle}` : name
   const ogImage = resolveOpenGraphImage(settings?.ogImage)
-  let metadataBase: URL | undefined = undefined
-  try {
-    metadataBase = settings?.ogImage?.metadataBase
-      ? new URL(settings.ogImage.metadataBase)
-      : undefined
-  } catch {
-    // ignore
-  }
+
   return {
-    metadataBase,
-    title: {
-      template: `%s | ${title}`,
-      default: title,
-    },
-    description,
-    openGraph: {
-      images: ogImage ? [ogImage] : [],
-    },
+    title: {template: `%s | ${name}`, default: title},
+    description: settings?.seoDescription || settings?.positioning || undefined,
+    openGraph: {images: ogImage ? [ogImage] : []},
   }
 }
 
@@ -69,6 +50,7 @@ const geistMono = Geist_Mono({
 
 export default async function RootLayout({children}: LayoutProps<'/'>) {
   const {isEnabled: isDraftMode} = await draftMode()
+  const {data: settings} = await sanityFetch({query: siteSettingsQuery})
 
   return (
     // suppressHydrationWarning: the head script may add data-theme before React hydrates.
@@ -82,11 +64,17 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
       </head>
       <body className="flex min-h-dvh flex-col">
         <SkipLink />
-        <SiteHeader />
+        <SiteHeader name={settings?.name || demo.name} />
         <main id="main" className="flex-1">
           {children}
         </main>
-        <SiteFooter />
+        <SiteFooter
+          name={settings?.name || demo.name}
+          email={settings?.email}
+          linkedInUrl={settings?.linkedInUrl}
+          githubUrl={settings?.githubUrl}
+          repoUrl={settings?.repoUrl}
+        />
         {/* Toasts for Sanity Live errors (app/client-utils.ts) and Draft Mode (DraftModeToast). */}
         <Toaster />
         {isDraftMode && (

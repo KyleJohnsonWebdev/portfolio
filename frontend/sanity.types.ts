@@ -15,6 +15,92 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: ../sanity.schema.json
+export type PathEntry = {
+  _type: 'pathEntry'
+  period: string
+  title: string
+  detail?: string
+}
+
+export type EducationEntry = {
+  _type: 'educationEntry'
+  credential: string
+  school: string
+  year?: number
+  honors?: string
+}
+
+export type SkillGroup = {
+  _type: 'skillGroup'
+  group: string
+  items: Array<string>
+}
+
+export type ExperienceEntry = {
+  _type: 'experienceEntry'
+  role: string
+  organization?: string
+  location?: string
+  start?: string
+  end?: string
+  periodLabel?: string
+  bullets?: Array<string>
+}
+
+export type Seo = {
+  _type: 'seo'
+  title?: string
+  description?: string
+  ogImage?: AccessibleImage
+}
+
+export type LighthouseProof = {
+  _type: 'lighthouseProof'
+  performance?: number
+  accessibility?: number
+  bestPractices?: number
+  seo?: number
+  testedOn?: string
+  reportUrl?: string
+}
+
+export type Decision = {
+  _type: 'decision'
+  title: string
+  chose: string
+  insteadOf: string
+  because: string
+  cost: string
+}
+
+export type Metric = {
+  _type: 'metric'
+  value: string
+  label: string
+  source: string
+  sourceUrl?: string
+  date: string
+}
+
+export type RichText = Array<{
+  children?: Array<{
+    marks?: Array<string>
+    text?: string
+    _type: 'span'
+    _key: string
+  }>
+  style?: 'normal' | 'h3'
+  listItem?: 'bullet' | 'number'
+  markDefs?: Array<{
+    href: string
+    _type: 'link'
+    _key: string
+  }>
+  level?: number
+  _type: 'block'
+  _key: string
+}>
+
 export type SanityImageAssetReference = {
   _ref: string
   _type: 'reference'
@@ -22,36 +108,155 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
-export type Settings = {
+export type AccessibleImage = {
+  _type: 'accessibleImage'
+  asset?: SanityImageAssetReference
+  media?: unknown
+  hotspot?: SanityImageHotspot
+  crop?: SanityImageCrop
+  alt?: string
+  caption?: string
+}
+
+export type CaseStudy = {
   _id: string
-  _type: 'settings'
+  _type: 'caseStudy'
   _createdAt: string
   _updatedAt: string
   _rev: string
   title: string
-  description?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    metadataBase?: string
-    _type: 'image'
+  slug: Slug
+  order: number
+  summary: string
+  status: 'live' | 'inProgress'
+  launchDate?: string
+  tag?: string
+  role: string
+  stack: Array<string>
+  timeline: {
+    start: string
+    end?: string
   }
+  outcome: Metric
+  liveUrl?: string
+  repoUrl?: string
+  heroImage: AccessibleImage
+  proof?: LighthouseProof
+  metrics?: Array<
+    {
+      _key: string
+    } & Metric
+  >
+  problem: RichText
+  constraints: Array<string>
+  decisions: Array<
+    {
+      _key: string
+    } & Decision
+  >
+  outcomeStory: RichText
+  nextSteps?: RichText
+  gallery?: Array<
+    {
+      _key: string
+    } & AccessibleImage
+  >
+  client?: string
+  clientPermission?: {
+    confirmed?: boolean
+    confirmedOn?: string
+  }
+  seo?: Seo
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
+export type Resume = {
+  _id: string
+  _type: 'resume'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  tagline: string
+  summary: string
+  experience: Array<
+    {
+      _key: string
+    } & ExperienceEntry
+  >
+  skills?: Array<
+    {
+      _key: string
+    } & SkillGroup
+  >
+  education?: Array<
+    {
+      _key: string
+    } & EducationEntry
+  >
+}
+
+export type About = {
+  _id: string
+  _type: 'about'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  headline: string
+  intro: string
+  story: RichText
+  portrait?: AccessibleImage
+  path?: Array<
+    {
+      _key: string
+    } & PathEntry
+  >
+  pathNote?: string
+  teaserTitle: string
+  teaserText: string
+}
+
+export type SanityFileAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.fileAsset'
+}
+
+export type SiteSettings = {
+  _id: string
+  _type: 'siteSettings'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  jobTitle: string
+  location?: string
+  workMode?: 'remote' | 'hybrid' | 'onsite'
+  timezone?: string
+  headline: string
+  positioning: string
+  stats?: Array<
+    {
+      _key: string
+    } & Metric
+  >
+  email: string
+  linkedInUrl: string
+  githubUrl: string
+  repoUrl: string
+  availability?: string
+  resumePdf?: {
+    asset?: SanityFileAssetReference
+    media?: unknown
+    _type: 'file'
+  }
+  seoDescription?: string
+  ogImage?: AccessibleImage
 }
 
 export type SanityImageCrop = {
@@ -167,15 +372,24 @@ export type Geopoint = {
   alt?: number
 }
 
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
-}
-
 export type AllSanitySchemaTypes =
+  | PathEntry
+  | EducationEntry
+  | SkillGroup
+  | ExperienceEntry
+  | Seo
+  | LighthouseProof
+  | Decision
+  | Metric
+  | RichText
   | SanityImageAssetReference
-  | Settings
+  | AccessibleImage
+  | CaseStudy
+  | Slug
+  | Resume
+  | About
+  | SanityFileAssetReference
+  | SiteSettings
   | SanityImageCrop
   | SanityImageHotspot
   | SanityImagePaletteSwatch
@@ -186,47 +400,73 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint
-  | Slug
 
 // Source: sanity/lib/queries.ts
-// Variable: settingsQuery
-// Query: *[_type == "settings"][0]
-export type SettingsQueryResult = {
-  _id: string
-  _type: 'settings'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  title: string
-  description?: Array<{
-    children?: Array<{
-      marks?: Array<string>
-      text?: string
-      _type: 'span'
-      _key: string
-    }>
-    style?: 'normal'
-    listItem?: never
-    markDefs?: null
-    level?: number
-    _type: 'block'
-    _key: string
-  }>
-  ogImage?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    metadataBase?: string
-    _type: 'image'
-  }
-} | null
+// Variable: siteSettingsQuery
+// Query: *[_id == "siteSettings"][0]{    name,    jobTitle,    location,    workMode,    headline,    positioning,    email,    linkedInUrl,    githubUrl,    repoUrl,    seoDescription,    ogImage  }
+export type SiteSettingsQueryResult =
+  | {
+      name: null
+      jobTitle: null
+      location: null
+      workMode: null
+      headline: null
+      positioning: null
+      email: null
+      linkedInUrl: null
+      githubUrl: null
+      repoUrl: null
+      seoDescription: null
+      ogImage: null
+    }
+  | {
+      name: null
+      jobTitle: null
+      location: null
+      workMode: null
+      headline: null
+      positioning: null
+      email: null
+      linkedInUrl: null
+      githubUrl: null
+      repoUrl: string | null
+      seoDescription: null
+      ogImage: null
+    }
+  | {
+      name: null
+      jobTitle: null
+      location: null
+      workMode: null
+      headline: string
+      positioning: null
+      email: null
+      linkedInUrl: null
+      githubUrl: null
+      repoUrl: null
+      seoDescription: null
+      ogImage: null
+    }
+  | {
+      name: string
+      jobTitle: string
+      location: string | null
+      workMode: 'hybrid' | 'onsite' | 'remote' | null
+      headline: string
+      positioning: string
+      email: string
+      linkedInUrl: string
+      githubUrl: string
+      repoUrl: string
+      seoDescription: string | null
+      ogImage: AccessibleImage | null
+    }
+  | null
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '*[_type == "settings"][0]': SettingsQueryResult
+    '\n  *[_id == "siteSettings"][0]{\n    name,\n    jobTitle,\n    location,\n    workMode,\n    headline,\n    positioning,\n    email,\n    linkedInUrl,\n    githubUrl,\n    repoUrl,\n    seoDescription,\n    ogImage\n  }\n': SiteSettingsQueryResult
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

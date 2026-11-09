@@ -4,17 +4,17 @@ import Link from 'next/link'
 import {usePathname} from 'next/navigation'
 
 import ThemeToggle from '@/app/components/ThemeToggle'
-import {primaryNav, site} from '@/lib/site'
+import {primaryNav} from '@/lib/site'
 
 /** Name on the left, four nav links and the ThemeToggle on the right. Wraps on phones; no hamburger. */
-export default function SiteHeader() {
+export default function SiteHeader({name}: {name: string}) {
   const pathname = usePathname()
 
   return (
     <header className="border-b border-line">
       <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-4 px-4 py-5 md:px-6">
         <Link href="/" className="font-semibold text-ink no-underline hover:text-ink">
-          {site.name}
+          {name}
         </Link>
         <nav
           aria-label="Primary"

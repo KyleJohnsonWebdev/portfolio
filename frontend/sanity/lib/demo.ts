@@ -1,8 +1,6 @@
 /**
- * Fallback copy used until the Settings document has content.
- * Step 3 replaces this with the real siteSettings model.
+ * Fallbacks used only until the Site settings document is published in the Studio.
+ * Nothing here is a fact about Kyle beyond his name; real copy comes from Sanity.
  */
 
-export const title = 'Kyle Johnson'
-
-export const description = 'Design engineer building fast, accessible, CMS-driven websites.'
+export const name = 'Kyle Johnson'
