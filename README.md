@@ -77,6 +77,18 @@ The rules live in `studio/src/schemaTypes/validation.ts` as plain functions with
 
 A published case study never has a gap: missing required facts block publishing. In draft preview (Presentation in the Studio), each missing fact renders as a dashed `[PLACEHOLDER]` naming what belongs there, so the page shows what is still needed instead of an invented number. Optional sections with no content, such as untested Lighthouse scores, are left out of published pages entirely.
 
+## Publishing updates
+
+Pages are static for speed. When content is published, unpublished or deleted in the Studio, a Sanity webhook calls `/api/revalidate`, which marks every page for regeneration so the change shows on the next visit. Sanity Live also updates pages that are open at the time.
+
+Setup (once):
+
+1. Generate a secret, e.g. `openssl rand -hex 32`.
+2. In Vercel, add `SANITY_REVALIDATE_SECRET` with that value (Production).
+3. At sanity.io/manage → API → Webhooks, create a webhook: URL `https://<production domain>/api/revalidate`, dataset `production`, triggers create, update and delete, filter `_type in ["siteSettings", "about", "resume", "caseStudy"]`, drafts off, method POST, and the same secret.
+
+Requests without a valid signature are rejected with 401.
+
 ## SEO
 
 - Every page has a title, description and canonical link. Case studies use their SEO fields, then fall back to the title, summary and hero screenshot.
