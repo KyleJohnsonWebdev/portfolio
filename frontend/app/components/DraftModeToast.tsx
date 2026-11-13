@@ -3,7 +3,7 @@
 import {useIsPresentationTool} from 'next-sanity/hooks'
 import {useRouter} from 'next/navigation'
 import {useEffect, useTransition} from 'react'
-import {toast} from 'sonner'
+import {toast, Toaster} from 'sonner'
 import {disableDraftMode} from '@/app/actions'
 
 export default function DraftModeToast() {
@@ -44,5 +44,6 @@ export default function DraftModeToast() {
     }
   }, [pending])
 
-  return null
+  // The toast container lives here, so it only loads with the rest of the draft-mode code.
+  return <Toaster />
 }
