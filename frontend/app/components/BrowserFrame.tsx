@@ -11,7 +11,7 @@ type BrowserFrameProps = {
   url?: string | null
   /** Passed to next/image so the browser picks the right size. */
   sizes: string
-  /** Set on the first, above-the-fold screenshot only. */
+  /** Set on the first, above-the-fold screenshot only: loads it eagerly at high priority. */
   priority?: boolean
   preview: boolean
 }
@@ -43,7 +43,8 @@ export default function BrowserFrame({image, url, sizes, priority, preview}: Bro
             alt={alt}
             fill
             sizes={sizes}
-            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             className="object-cover"
             style={objectPosition ? {objectPosition} : undefined}
           />
