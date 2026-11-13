@@ -57,7 +57,8 @@ export default async function AboutPage() {
               fill
               sizes="(min-width: 760px) 368px, 100vw"
               className="object-cover"
-              priority
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
         ) : preview ? (

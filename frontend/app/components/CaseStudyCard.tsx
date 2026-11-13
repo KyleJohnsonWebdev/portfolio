@@ -1,5 +1,5 @@
 import {stegaClean} from 'next-sanity'
-import {Image} from 'next-sanity/image'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import Placeholder from '@/app/components/Placeholder'
@@ -17,11 +17,19 @@ type CaseStudyCardProps = {
   tag?: string | null
   outcome?: Partial<Metric> | null
   heroImage?: AccessibleImage | null
+  /** The first card's screenshot is the largest thing on a phone screen: load it first. */
+  priority?: boolean
   preview: boolean
 }
 
 /**
- * Home page listing for one case study. The whole card is one link, so there are no
+ * Home page listing for one case study. The screenshot goes through Next.js's image optimizer
+ * on this site's own domain rather than straight from Sanity's CDN: on a phone it is the largest
+ * thing on the home page, and a second domain made it arrive after the JavaScript, costing
+ * about 5 Lighthouse performance points. Case study pages keep Sanity's CDN (their largest
+ * element on a phone is text).
+ *
+ * The whole card is one link, so there are no
  * nested links. The screenshot is decorative here (alt=""): the title names the work,
  * and the case study page carries the descriptive alt text.
  */
@@ -34,6 +42,7 @@ export default function CaseStudyCard({
   tag,
   outcome,
   heroImage,
+  priority = false,
   preview,
 }: CaseStudyCardProps) {
   const hotspot = heroImage?.hotspot
@@ -51,6 +60,8 @@ export default function CaseStudyCard({
             alt=""
             fill
             sizes="(min-width: 1200px) 368px, (min-width: 760px) 33vw, 100vw"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             className="object-cover"
             style={
               hotspot ? {objectPosition: `${hotspot.x * 100}% ${hotspot.y * 100}%`} : undefined

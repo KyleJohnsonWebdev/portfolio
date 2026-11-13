@@ -6,9 +6,9 @@ import type {Metadata} from 'next'
 import {Geist, Geist_Mono} from 'next/font/google'
 import {draftMode} from 'next/headers'
 import {VisualEditing} from 'next-sanity/visual-editing'
-import {Toaster} from 'sonner'
+import {preconnect} from 'react-dom'
 
-import DraftModeToast from '@/app/components/DraftModeToast'
+import DraftModeToastLoader from '@/app/components/DraftModeToastLoader'
 import SiteFooter from '@/app/components/SiteFooter'
 import SiteHeader from '@/app/components/SiteHeader'
 import SkipLink from '@/app/components/SkipLink'
@@ -18,7 +18,6 @@ import * as demo from '@/sanity/lib/demo'
 import {sanityFetch, SanityLive} from '@/sanity/lib/live'
 import {siteSettingsQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
-import {handleError} from '@/app/client-utils'
 
 /**
  * Site-wide metadata. Pages override title and description with their own generateMetadata.
@@ -62,10 +61,16 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
   display: 'swap',
+  // Mono only styles small labels; not preloading it keeps it out of the way of the
+  // first screenshot on slow connections. It still loads as soon as the CSS asks for it.
+  preload: false,
 })
 
 export default async function RootLayout({children}: LayoutProps<'/'>) {
   const {isEnabled: isDraftMode} = await draftMode()
+  // Screenshots load from Sanity's CDN; opening that connection early shortens the time to
+  // the first case study image, which is the largest element on a phone.
+  preconnect('https://cdn.sanity.io')
   const {data: settings} = await sanityFetch({query: siteSettingsQuery})
 
   return (
@@ -91,17 +96,17 @@ export default async function RootLayout({children}: LayoutProps<'/'>) {
           githubUrl={settings?.githubUrl}
           repoUrl={settings?.repoUrl}
         />
-        {/* Toasts for Sanity Live errors (app/client-utils.ts) and Draft Mode (DraftModeToast). */}
-        <Toaster />
+        {/* Editing tools, only while Draft Mode is on. Visitors don't load them: published
+            changes reach them through the publish webhook (/api/revalidate). */}
         {isDraftMode && (
           <>
-            <DraftModeToast />
+            {/* Makes sanityFetch calls live while editing. */}
+            <SanityLive />
+            <DraftModeToastLoader />
             {/* Visual Editing overlays, only while Draft Mode is on. */}
             <VisualEditing />
           </>
         )}
-        {/* Makes every sanityFetch call live; always rendered. */}
-        <SanityLive onError={handleError} />
         {/* Real-visitor analytics and Core Web Vitals. Their scripts exist only on Vercel,
             so they are skipped locally and in CI, where they would 404. */}
         {onVercel && (
