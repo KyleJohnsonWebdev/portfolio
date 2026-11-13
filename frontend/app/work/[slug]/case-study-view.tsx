@@ -160,13 +160,22 @@ export default function CaseStudyView({
       </Section>
 
       {study.gallery?.length ? (
-        <section aria-label="Screenshots" className={`${container} grid gap-6 md:grid-cols-2`}>
+        // One screenshot gets the full width (a comparison needs room to read); two or more
+        // sit in two columns.
+        <section
+          aria-label="Screenshots"
+          className={`${container} grid gap-6 ${study.gallery.length > 1 ? 'md:grid-cols-2' : ''}`}
+        >
           {study.gallery.map((image) => (
             <BrowserFrame
               key={image._key}
               image={image}
               url={displayHost(liveUrl) ?? study.title}
-              sizes="(min-width: 1200px) 564px, (min-width: 760px) 50vw, 100vw"
+              sizes={
+                study.gallery!.length > 1
+                  ? '(min-width: 1200px) 564px, (min-width: 760px) 50vw, 100vw'
+                  : '(min-width: 1200px) 1152px, 100vw'
+              }
               preview={preview}
             />
           ))}
