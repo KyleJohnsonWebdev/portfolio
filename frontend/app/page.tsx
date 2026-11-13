@@ -85,8 +85,8 @@ export default async function HomePage() {
         </h2>
         {caseStudies.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {caseStudies.map((study) => (
-              <CaseStudyCard key={study._id} {...study} preview={preview} />
+            {caseStudies.map((study, index) => (
+              <CaseStudyCard key={study._id} {...study} priority={index === 0} preview={preview} />
             ))}
           </div>
         ) : (
