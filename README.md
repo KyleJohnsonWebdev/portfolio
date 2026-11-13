@@ -4,6 +4,19 @@ A design engineer portfolio built as a working example of its own pitch: a fast,
 
 Status: all v1 pages are built, with SEO metadata and CI quality gates. Next: publish two finished case studies and ship v1.
 
+## Design
+
+**"Editorial Proof": a calm, type-led site where evidence is the decoration.** The visual feature is proof (Lighthouse scores, sourced numbers, real screenshots), not illustration or motion.
+
+- **Type does the work.** Geist for everything, Geist Mono for data and labels. One scale from a 17px body, prose capped at 68 characters.
+- **One accent.** Cobalt is reserved for links, the primary button and focus. Green appears only in the Proof Strip, next to the word "Pass", never as color alone.
+- **Warm paper and ink, light and dark from day one.** The theme follows the system setting, with a toggle that never flashes the wrong theme. Every text color passes WCAG 2.2 AA in both modes.
+- **No shadows, gradients or load animation.** Borders mark cards and tinted bands mark sections. Motion is 150ms feedback on hover and focus, and it turns off under reduced motion.
+- **Real screenshots in a plain browser frame.** Fixed 16:10, so nothing shifts while loading. No device mockups.
+- **Honest placeholders.** A missing fact shows as a dashed `[PLACEHOLDER]` in drafts, never as an invented number.
+
+Full principles, tokens, contrast ratios, component inventory and design decisions: [`docs/design-system/`](docs/design-system/).
+
 ## Stack
 
 - Next.js 16 (App Router, Turbopack), React 19, TypeScript (strict)
