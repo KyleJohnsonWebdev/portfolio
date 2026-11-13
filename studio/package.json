@@ -19,17 +19,17 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sanity/icons": "^3.7.4",
+    "@sanity/icons": "^3.8.0",
     "@sanity/vision": "^6.22.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "rxjs": "^7.8.2",
     "sanity": "^6.22.0",
-    "styled-components": "^6.4.2"
+    "styled-components": "^6.6.0"
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^6.0.0",
-    "@types/react": "^19.2.16",
+    "@types/react": "^19.3.0",
     "typescript": "^5.9.3"
   }
 }
