@@ -120,7 +120,7 @@ WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI (`.github/workf
 
 Pages come from the sitemap, so new case studies are tested as soon as they are published.
 
-Latest Lighthouse (mobile, local production build, Nov 9, 2026; Home and Contact, the published pages so far):
+Latest Lighthouse (mobile, local production build, Nov 16, 2026; every page in the sitemap: Home, About with Contact, Resume and the published case study):
 
 | Category       | Score |
 | -------------- | ----- |
