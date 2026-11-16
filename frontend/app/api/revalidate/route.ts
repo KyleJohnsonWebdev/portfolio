@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
 
     // The whole site is small and every page reads shared settings, so refresh all of it.
     revalidatePath('/', 'layout')
+    // sitemap.xml is a route handler, not a page under the layout, so it needs its own call;
+    // without it, newly published pages stay out of the sitemap until the next deploy.
+    revalidatePath('/sitemap.xml')
     return NextResponse.json({revalidated: true, type: body?._type ?? null})
   } catch (error) {
     console.error(error)
