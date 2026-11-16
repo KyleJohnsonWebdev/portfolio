@@ -77,3 +77,46 @@ test('robots.txt and sitemap.xml are served', async ({request}) => {
   expect((await request.get('/robots.txt')).ok()).toBe(true)
   expect((await request.get('/sitemap.xml')).ok()).toBe(true)
 })
+
+test('/contact redirects permanently to the contact section on About', async ({request}) => {
+  const response = await request.get('/contact', {maxRedirects: 0})
+  expect(response.status()).toBe(308)
+  expect(response.headers()['location']).toBe('/about#contact')
+})
+
+test('the nav highlights Contact on the contact section and About above it', async ({page}) => {
+  const nav = page.getByRole('navigation', {name: 'Primary'})
+  const about = nav.getByRole('link', {name: 'About', exact: true})
+  const contact = nav.getByRole('link', {name: 'Contact', exact: true})
+
+  // Arriving through the Contact link: Contact is the current location.
+  await page.goto('/about#contact')
+  await expect(contact).toHaveAttribute('aria-current', 'location')
+  await expect(about).toHaveAttribute('aria-current', 'page')
+
+  // Scrolling back up to the story: Contact is no longer highlighted.
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await expect(contact).not.toHaveAttribute('aria-current', 'location')
+  await expect(about).toHaveAttribute('aria-current', 'page')
+})
+
+test('after jumping to the contact section, Tab reaches the email button first', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'keyboard navigation is checked on desktop')
+  const contactLink = page
+    .getByRole('navigation', {name: 'Primary'})
+    .getByRole('link', {name: 'Contact', exact: true})
+
+  // From another page, and from the top of About itself.
+  for (const start of ['/', '/about']) {
+    await test.step(`from ${start}`, async () => {
+      await page.goto(start)
+      await contactLink.click()
+      await expect(page).toHaveURL(/\/about#contact$/)
+      await page.keyboard.press('Tab')
+      await expect(page.getByRole('link', {name: 'Email me'})).toBeFocused()
+    })
+  }
+})
