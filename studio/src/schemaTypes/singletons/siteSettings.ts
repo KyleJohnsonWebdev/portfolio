@@ -53,7 +53,7 @@ export const siteSettings = defineType({
       name: 'timezone',
       type: 'string',
       group: 'identity',
-      description: 'e.g. "Eastern Time". Shown on the Contact page.',
+      description: 'e.g. "Eastern Time". Shown in the Contact section at the bottom of About.',
     }),
 
     // Home

@@ -16,7 +16,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {url: absoluteUrl('/'), lastModified: data.settings ?? undefined, priority: 1},
     ...(data.about ? [{url: absoluteUrl('/about'), lastModified: data.about}] : []),
     ...(data.resume ? [{url: absoluteUrl('/resume'), lastModified: data.resume}] : []),
-    {url: absoluteUrl('/contact'), lastModified: data.settings ?? undefined},
   ]
 
   const caseStudies = data.caseStudies.map((study) => ({

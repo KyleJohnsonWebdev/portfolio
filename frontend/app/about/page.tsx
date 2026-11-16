@@ -4,10 +4,11 @@ import {notFound} from 'next/navigation'
 import {stegaClean} from 'next-sanity'
 import {Image} from 'next-sanity/image'
 
+import Button from '@/app/components/Button'
 import Placeholder from '@/app/components/Placeholder'
 import PortableText from '@/app/components/PortableText'
 import {sanityFetch} from '@/sanity/lib/live'
-import {aboutQuery} from '@/sanity/lib/queries'
+import {aboutQuery, contactQuery} from '@/sanity/lib/queries'
 import {urlForImage} from '@/sanity/lib/utils'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,8 +24,9 @@ const container = 'mx-auto w-full max-w-page px-4 md:px-6'
 
 /** The teaching story, a headshot, and the path from classroom to design engineer. */
 export default async function AboutPage() {
-  const [{data: about}, {isEnabled: preview}] = await Promise.all([
+  const [{data: about}, {data: contact}, {isEnabled: preview}] = await Promise.all([
     sanityFetch({query: aboutQuery}),
+    sanityFetch({query: contactQuery}),
     draftMode(),
   ])
   if (!about && !preview) notFound()
@@ -94,6 +96,54 @@ export default async function AboutPage() {
           )}
         </section>
       ) : null}
+
+      {/*
+        Contact closes the About story, as in the wireframe. The nav's Contact link points
+        here (/about#contact) and /contact redirects here. The email is also shown as plain,
+        selectable text because a mailto link can fail when no mail app is set up.
+      */}
+      {/* tabIndex -1: the nav moves keyboard focus here, so the next Tab reaches "Email me". */}
+      <section
+        id="contact"
+        aria-labelledby="contact-heading"
+        tabIndex={-1}
+        className="bg-surface focus:outline-none"
+      >
+        <div className={`${container} flex flex-col gap-5 py-14`}>
+          <h2 id="contact-heading" className="text-h2">
+            Contact
+          </h2>
+          {contact?.availability && (
+            <p className="max-w-reading text-muted">{contact.availability}</p>
+          )}
+          <ul className="flex flex-wrap gap-3">
+            {contact?.email && (
+              <li>
+                <Button href={`mailto:${contact.email}`} variant="primary" prefetch={false}>
+                  Email me
+                </Button>
+              </li>
+            )}
+            {contact?.linkedInUrl && (
+              <li>
+                <Button href={contact.linkedInUrl} prefetch={false}>
+                  LinkedIn
+                </Button>
+              </li>
+            )}
+            {contact?.githubUrl && (
+              <li>
+                <Button href={contact.githubUrl} prefetch={false}>
+                  GitHub
+                </Button>
+              </li>
+            )}
+          </ul>
+          <p className="font-mono text-meta text-muted">
+            {[contact?.email, contact?.location, contact?.timezone].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+      </section>
     </div>
   )
 }
