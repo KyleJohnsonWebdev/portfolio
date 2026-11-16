@@ -167,7 +167,7 @@ Every push runs [CI](../../.github/workflows/ci.yml), and a red check blocks the
 | Playwright ([`pages.spec.ts`](../../frontend/e2e/pages.spec.ts)) | One `h1` per page, no skipped heading levels, no sideways scroll, skip link first, theme applied before paint, 404 for unknown pages |
 | Lighthouse CI ([`lighthouserc.json`](../../frontend/lighthouserc.json)) | Mobile, three runs per page, median: 95+ in performance, accessibility, best practices and SEO |
 
-Latest results (Nov 13, 2026, mobile, production build): Lighthouse 100 in accessibility, best practices and SEO on every published page; performance 100 on Contact and the case study, and 98–100 on Home across runs. 0 axe violations.
+Latest results (Nov 16, 2026, mobile, production build): Lighthouse 100 in all four categories on every published page (Home, About with Contact, Resume and the case study). 0 axe violations.
 
 Pages come from `sitemap.xml`, so a new case study is tested the moment it's published.
 
