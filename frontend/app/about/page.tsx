@@ -37,35 +37,42 @@ export default async function AboutPage() {
 
   return (
     <div className="flex flex-col gap-18 pt-16 pb-24">
+      {/*
+        Three grid items: headline + intro, headshot, story. Phones stack them in that order,
+        so the photo appears right after the intro at half width instead of after the whole
+        story. From 760px the headshot moves to the right column, spanning both rows.
+      */}
       <section
-        className={`${container} grid items-start gap-12 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]`}
+        className={`${container} grid items-start gap-x-12 gap-y-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:gap-y-5`}
       >
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 md:col-start-1 md:row-start-1">
           <h1 className="text-display">{about?.headline || 'About'}</h1>
           {about?.intro && <p className="max-w-reading text-lead text-muted">{about.intro}</p>}
-          {about?.story?.length ? (
-            <PortableText value={about.story} />
-          ) : (
-            missing('Story, about 250 words: one concrete moment, not a summary')
-          )}
         </div>
         {about?.portrait?.asset?._ref ? (
-          <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-surface">
+          <div className="relative aspect-[4/5] w-1/2 overflow-hidden rounded-lg bg-surface md:col-start-2 md:row-span-2 md:row-start-1 md:w-full">
             <Image
               src={urlForImage(about.portrait).url()}
               alt={stegaClean(about.portrait.alt) ?? ''}
               fill
-              sizes="(min-width: 760px) 368px, 100vw"
+              sizes="(min-width: 760px) 368px, 50vw"
               className="object-cover"
               loading="eager"
               fetchPriority="high"
             />
           </div>
         ) : preview ? (
-          <div className="flex aspect-[4/5] items-center justify-center rounded-lg border-[1.5px] border-dashed border-border-strong bg-surface">
+          <div className="flex aspect-[4/5] w-1/2 items-center justify-center rounded-lg border-[1.5px] border-dashed border-border-strong bg-surface md:col-start-2 md:row-span-2 md:row-start-1 md:w-full">
             <Placeholder label="Headshot — alt text required" />
           </div>
         ) : null}
+        <div className="md:col-start-1 md:row-start-2">
+          {about?.story?.length ? (
+            <PortableText value={about.story} />
+          ) : (
+            missing('Story, about 250 words: one concrete moment, not a summary')
+          )}
+        </div>
       </section>
 
       {about?.pathEntries?.length ? (
