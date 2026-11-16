@@ -52,14 +52,13 @@ export default defineConfig({
           {route: '/work/:slug', filter: `_type == "caseStudy" && slug.current == $slug`},
           {route: '/about', filter: `_id == "about"`},
           {route: '/resume', filter: `_id == "resume"`},
-          {route: '/contact', filter: `_id == "siteSettings"`},
         ]),
         // Where a document appears on the site. https://www.sanity.io/docs/visual-editing/presentation-resolver-api#8d8bca7bfcd7
         locations: {
           siteSettings: defineLocations({
             message: 'Used in the header and footer on every page',
             tone: 'positive',
-            locations: [home, {title: 'Contact', href: '/contact'}],
+            locations: [home, {title: 'About: Contact section', href: '/about#contact'}],
           }),
           caseStudy: defineLocations({
             select: {title: 'title', slug: 'slug.current'},
