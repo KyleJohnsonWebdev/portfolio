@@ -37,7 +37,7 @@ npm run dev
 ```
 
 - Site: http://localhost:3000
-- Studio: http://localhost:3333
+- Studio: http://localhost:3333 (hosted: https://kylejohnsonwebdev.sanity.studio)
 
 Other scripts, all from the repo root:
 
@@ -53,6 +53,17 @@ Other scripts, all from the repo root:
 | `npm run format`                 | Formats the repo with Prettier                                     |
 
 The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never commit `.env*` files.
+
+### Deploying the Studio
+
+The hosted Studio is a static build, so its settings are fixed at deploy time. Put the live site's address in `studio/.env.production` (not committed) so the Presentation tool previews the real site instead of localhost:
+
+```shell
+echo 'SANITY_STUDIO_PREVIEW_URL="https://<production domain>"' > studio/.env.production
+cd studio && npx sanity deploy
+```
+
+`deployment.appId` in `studio/sanity.cli.ts` points the deploy at the existing Studio. Deploying also updates the schema stored in Sanity. The site's edit links use `NEXT_PUBLIC_SANITY_STUDIO_URL`, set in Vercel to the hosted Studio's address.
 
 ### Design tokens
 
