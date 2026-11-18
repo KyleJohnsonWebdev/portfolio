@@ -41,16 +41,16 @@ npm run dev
 
 Other scripts, all from the repo root:
 
-| Command                          | What it does                                                       |
-| -------------------------------- | ------------------------------------------------------------------ |
-| `npm run build`                  | Builds the site and the Studio through Turborepo                   |
-| `npm run type-check`             | Runs `tsc` in both workspaces                                      |
-| `npm run lint`                   | Lints the site and the Studio                                      |
-| `npm test`                       | Runs the Studio's validation rule tests                            |
-| `npm run format:check`           | Fails on unformatted files (what CI runs)                          |
-| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)             |
-| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (see Quality bar)       |
-| `npm run format`                 | Formats the repo with Prettier                                     |
+| Command                          | What it does                                                 |
+| -------------------------------- | ------------------------------------------------------------ |
+| `npm run build`                  | Builds the site and the Studio through Turborepo             |
+| `npm run type-check`             | Runs `tsc` in both workspaces                                |
+| `npm run lint`                   | Lints the site and the Studio                                |
+| `npm test`                       | Runs the Studio's validation rule tests                      |
+| `npm run format:check`           | Fails on unformatted files (what CI runs)                    |
+| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)       |
+| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (see Quality bar) |
+| `npm run format`                 | Formats the repo with Prettier                               |
 
 The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never commit `.env*` files.
 
