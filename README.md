@@ -41,16 +41,16 @@ npm run dev
 
 Other scripts, all from the repo root:
 
-| Command                          | What it does                                                       |
-| -------------------------------- | ------------------------------------------------------------------ |
-| `npm run build`                  | Builds the site and the Studio through Turborepo                   |
-| `npm run type-check`             | Runs `tsc` in both workspaces                                      |
-| `npm run lint`                   | Lints the site and the Studio                                      |
-| `npm test`                       | Runs the Studio's validation rule tests                            |
-| `npm run format:check`           | Fails on unformatted files (what CI runs)                          |
-| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)             |
-| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (after `npm run build`) |
-| `npm run format`                 | Formats the repo with Prettier                                     |
+| Command                          | What it does                                                 |
+| -------------------------------- | ------------------------------------------------------------ |
+| `npm run build`                  | Builds the site and the Studio through Turborepo             |
+| `npm run type-check`             | Runs `tsc` in both workspaces                                |
+| `npm run lint`                   | Lints the site and the Studio                                |
+| `npm test`                       | Runs the Studio's validation rule tests                      |
+| `npm run format:check`           | Fails on unformatted files (what CI runs)                    |
+| `npm run test:e2e -w frontend`   | Playwright + axe browser tests (after `npm run build`)       |
+| `npm run lighthouse -w frontend` | Lighthouse CI on every page in the sitemap (see Quality bar) |
+| `npm run format`                 | Formats the repo with Prettier                               |
 
 The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never commit `.env*` files.
 
@@ -120,14 +120,27 @@ WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI (`.github/workf
 
 Pages come from the sitemap, so new case studies are tested as soon as they are published.
 
-Latest Lighthouse (mobile, local production build, Nov 16, 2026; every page in the sitemap: Home, About with Contact, Resume and the published case study):
+Latest Lighthouse on the live site, [kylejohnsonwebdev.com](https://kylejohnsonwebdev.com) (Lighthouse 13.6, mobile, median of 3 runs, Nov 20, 2026; every page in the sitemap):
 
-| Category       | Score |
-| -------------- | ----- |
-| Performance    | 100   |
-| Accessibility  | 100   |
-| Best practices | 100   |
-| SEO            | 100   |
+| Page                   | Performance | Accessibility | Best practices | SEO | LCP   | CLS   |
+| ---------------------- | ----------- | ------------- | -------------- | --- | ----- | ----- |
+| `/`                    | 100         | 100           | 100            | 100 | 0.9 s | 0.016 |
+| `/about`               | 100         | 100           | 100            | 100 | 0.8 s | 0     |
+| `/resume`              | 100         | 100           | 100            | 100 | 0.8 s | 0     |
+| `/work/maybespecial`   | 100         | 100           | 100            | 100 | 0.9 s | 0     |
+| `/work/this-portfolio` | 100         | 100           | 100            | 100 | 0.9 s | 0     |
+
+The same day, axe (WCAG 2.2 AA) found no violations on any live page, in light and dark, at phone and desktop sizes.
+
+To run Lighthouse locally, build the way CI does:
+
+```sh
+NEXT_PUBLIC_SITE_URL=http://localhost:3000 npx turbo run build --filter=frontend --force
+npm run lighthouse -w frontend
+```
+
+- `NEXT_PUBLIC_SITE_URL` makes the build behave like production. Without it, every page is marked `noindex` (as previews are) and SEO drops to about 69.
+- `--force` skips Turborepo's cache. Sanity content isn't a build input, so after publishing, a plain `npm run build` can replay the last build and leave new case studies out of the sitemap.
 
 ## Decisions
 
