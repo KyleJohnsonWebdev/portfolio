@@ -1,4 +1,4 @@
-import type {Metadata} from 'next'
+import type {Metadata, ResolvingMetadata} from 'next'
 import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 import {stegaClean} from 'next-sanity'
@@ -7,16 +7,21 @@ import {Image} from 'next-sanity/image'
 import Button from '@/app/components/Button'
 import Placeholder from '@/app/components/Placeholder'
 import PortableText from '@/app/components/PortableText'
+import {pageOpenGraph} from '@/lib/open-graph'
 import {sanityFetch} from '@/sanity/lib/live'
 import {aboutQuery, contactQuery} from '@/sanity/lib/queries'
 import {urlForImage} from '@/sanity/lib/utils'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(
+  _props: PageProps<'/about'>,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const {data: about} = await sanityFetch({query: aboutQuery, stega: false})
   return {
     title: 'About',
     description: about?.intro || undefined,
     alternates: {canonical: '/about'},
+    openGraph: await pageOpenGraph(parent, '/about'),
   }
 }
 

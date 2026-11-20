@@ -1,4 +1,4 @@
-import type {Metadata} from 'next'
+import type {Metadata, ResolvingMetadata} from 'next'
 import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 import {stegaClean} from 'next-sanity'
@@ -7,16 +7,21 @@ import Button from '@/app/components/Button'
 import Placeholder from '@/app/components/Placeholder'
 import ResumeBlock from '@/app/components/ResumeBlock'
 import {formatFileSize, formatRange} from '@/lib/format'
+import {pageOpenGraph} from '@/lib/open-graph'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/live'
 import {resumeQuery} from '@/sanity/lib/queries'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(
+  _props: PageProps<'/resume'>,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const {data} = await sanityFetch({query: resumeQuery, stega: false})
   return {
     title: 'Resume',
     description: data.resume?.summary || undefined,
     alternates: {canonical: '/resume'},
+    openGraph: await pageOpenGraph(parent, '/resume'),
   }
 }
 

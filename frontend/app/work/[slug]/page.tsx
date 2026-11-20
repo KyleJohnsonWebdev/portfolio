@@ -1,4 +1,4 @@
-import type {Metadata} from 'next'
+import type {Metadata, ResolvingMetadata} from 'next'
 import {draftMode} from 'next/headers'
 import {notFound} from 'next/navigation'
 import {stegaClean} from 'next-sanity'
@@ -8,6 +8,7 @@ import {sanityFetch} from '@/sanity/lib/live'
 import {caseStudyQuery, caseStudySlugsQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage, urlForImage} from '@/sanity/lib/utils'
 import {serializeJsonLd} from '@/lib/json-ld'
+import {pageOpenGraph} from '@/lib/open-graph'
 import {absoluteUrl} from '@/lib/site-url'
 
 /** Prerender every published case study at build time. New ones render on first visit. */
@@ -20,7 +21,10 @@ export async function generateStaticParams() {
   return data
 }
 
-export async function generateMetadata(props: PageProps<'/work/[slug]'>): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<'/work/[slug]'>,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const params = await props.params
   const {data: study} = await sanityFetch({query: caseStudyQuery, params, stega: false})
   if (!study) return {}
@@ -30,7 +34,10 @@ export async function generateMetadata(props: PageProps<'/work/[slug]'>): Promis
     title: study.seo?.title || study.title,
     description: study.seo?.description || study.summary,
     alternates: {canonical: `/work/${study.slug}`},
-    openGraph: {type: 'article', images: ogImage ? [ogImage] : []},
+    openGraph: await pageOpenGraph(parent, `/work/${study.slug}`, {
+      type: 'article',
+      images: ogImage ? [ogImage] : undefined,
+    }),
   }
 }
 

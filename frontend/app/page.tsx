@@ -1,4 +1,4 @@
-import type {Metadata} from 'next'
+import type {Metadata, ResolvingMetadata} from 'next'
 import {draftMode} from 'next/headers'
 import {stegaClean} from 'next-sanity'
 import {Image} from 'next-sanity/image'
@@ -9,13 +9,19 @@ import CaseStudyCard from '@/app/components/CaseStudyCard'
 import Placeholder from '@/app/components/Placeholder'
 import {formatMonthYear} from '@/lib/format'
 import {serializeJsonLd} from '@/lib/json-ld'
+import {pageOpenGraph} from '@/lib/open-graph'
 import {absoluteUrl} from '@/lib/site-url'
 import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/live'
 import {homeQuery} from '@/sanity/lib/queries'
 import {urlForImage} from '@/sanity/lib/utils'
 
-export const metadata: Metadata = {alternates: {canonical: '/'}}
+export async function generateMetadata(
+  _props: PageProps<'/'>,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  return {alternates: {canonical: '/'}, openGraph: await pageOpenGraph(parent, '/')}
+}
 
 const container = 'mx-auto w-full max-w-page px-4 md:px-6'
 const WORK_MODE: Record<string, string> = {remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site'}
