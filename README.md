@@ -2,7 +2,9 @@
 
 A design engineer portfolio built as a working example of its own pitch: a fast, accessible, CMS-driven website that a team can update themselves and that search engines can find.
 
-Status: all v1 pages are built, with SEO metadata and CI quality gates. Next: publish two finished case studies and ship v1.
+Live at **[kylejohnsonwebdev.com](https://kylejohnsonwebdev.com)**.
+
+Status: v1 is live with two case studies, SEO metadata and CI quality gates. Next: more case studies as they finish.
 
 ## Design
 
@@ -59,7 +61,7 @@ The Studio reads `studio/.env`; copy `studio/.env.example` the first time. Never
 The hosted Studio is a static build, so its settings are fixed at deploy time. Put the live site's address in `studio/.env.production` (not committed) so the Presentation tool previews the real site instead of localhost:
 
 ```shell
-echo 'SANITY_STUDIO_PREVIEW_URL="https://<production domain>"' > studio/.env.production
+echo 'SANITY_STUDIO_PREVIEW_URL="https://kylejohnsonwebdev.com"' > studio/.env.production
 cd studio && npx sanity deploy
 ```
 
@@ -109,7 +111,7 @@ Setup (once):
 
 1. Generate a secret, e.g. `openssl rand -hex 32`.
 2. In Vercel, add `SANITY_REVALIDATE_SECRET` with that value (Production).
-3. At sanity.io/manage → API → Webhooks, create a webhook: URL `https://<production domain>/api/revalidate`, dataset `production`, triggers create, update and delete, filter `_type in ["siteSettings", "about", "resume", "caseStudy"]`, drafts off, method POST, and the same secret.
+3. At sanity.io/manage → API → Webhooks, create a webhook: URL `https://kylejohnsonwebdev.com/api/revalidate` (the canonical domain: other domains redirect, and a webhook may not follow the redirect), dataset `production`, triggers create, update and delete, filter `_type in ["siteSettings", "about", "resume", "caseStudy"]`, drafts off, method POST, and the same secret.
 
 Requests without a valid signature are rejected with 401.
 
@@ -119,7 +121,7 @@ Requests without a valid signature are rejected with 401.
 - JSON-LD: `Person` on the home page and `CreativeWork` on each case study, built only from Sanity fields.
 - `/sitemap.xml` lists published pages and case studies with their last edit dates; About and Resume appear once published.
 - `/robots.txt` allows crawling on production only. Preview deployments also send `noindex`, so they never show up in search.
-- Set `NEXT_PUBLIC_SITE_URL` in Vercel (Production) when the custom domain is live; until then the Vercel production URL is used.
+- `NEXT_PUBLIC_SITE_URL` (Vercel, Production) is `https://kylejohnsonwebdev.com`, so canonical links, the sitemap and share tags use the custom domain. `www.kylejohnsonwebdev.com` and the old `*.vercel.app` production address 308-redirect to it, path included, so search engines see one site. The domain is also in Sanity's CORS origins, which Sanity Live needs in visitors' browsers.
 
 ## Quality bar
 
