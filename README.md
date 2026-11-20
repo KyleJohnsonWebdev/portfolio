@@ -120,17 +120,19 @@ WCAG 2.2 AA and Lighthouse 95+ in every category, enforced in CI (`.github/workf
 
 Pages come from the sitemap, so new case studies are tested as soon as they are published.
 
-Latest Lighthouse (mobile, median of 3 runs, local production build, Nov 18, 2026; every page in the sitemap):
+Latest Lighthouse on the live site, [kylejohnsonwebdev.com](https://kylejohnsonwebdev.com) (Lighthouse 13.6, mobile, median of 3 runs, Nov 20, 2026; every page in the sitemap):
 
-| Page                   | Performance | Accessibility | Best practices | SEO |
-| ---------------------- | ----------- | ------------- | -------------- | --- |
-| `/`                    | 97          | 100           | 100            | 100 |
-| `/about`               | 100         | 100           | 100            | 100 |
-| `/resume`              | 100         | 100           | 100            | 100 |
-| `/work/maybespecial`   | 100         | 100           | 100            | 100 |
-| `/work/this-portfolio` | 100         | 100           | 100            | 100 |
+| Page                   | Performance | Accessibility | Best practices | SEO | LCP   | CLS   |
+| ---------------------- | ----------- | ------------- | -------------- | --- | ----- | ----- |
+| `/`                    | 100         | 100           | 100            | 100 | 0.9 s | 0.016 |
+| `/about`               | 100         | 100           | 100            | 100 | 0.8 s | 0     |
+| `/resume`              | 100         | 100           | 100            | 100 | 0.8 s | 0     |
+| `/work/maybespecial`   | 100         | 100           | 100            | 100 | 0.9 s | 0     |
+| `/work/this-portfolio` | 100         | 100           | 100            | 100 | 0.9 s | 0     |
 
-To reproduce these locally, build the way CI does:
+The same day, axe (WCAG 2.2 AA) found no violations on any live page, in light and dark, at phone and desktop sizes.
+
+To run Lighthouse locally, build the way CI does:
 
 ```sh
 NEXT_PUBLIC_SITE_URL=http://localhost:3000 npx turbo run build --filter=frontend --force
