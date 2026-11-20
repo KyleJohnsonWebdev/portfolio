@@ -17,6 +17,9 @@ export default defineCliConfig({
   },
   studioHost: process.env.SANITY_STUDIO_STUDIO_HOST || '', // Visit https://www.sanity.io/docs/studio/environment-variables to learn more about using environment variables for local & production.
   deployment: {
+    // Identifies the hosted Studio (kylejohnsonwebdev.sanity.studio), so
+    // `npx sanity deploy` updates it instead of asking which one to use.
+    appId: 'm56heqkcxqszlvh9dsxeifdk',
     autoUpdates: true,
   },
   typegen: {
